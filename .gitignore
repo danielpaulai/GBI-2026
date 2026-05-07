@@ -28,3 +28,6 @@
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+
+# Standalone repo (push Jarvis only from jarvis-stage/)
+jarvis-stage/
