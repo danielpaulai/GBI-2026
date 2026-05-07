@@ -1,0 +1,256 @@
+---
+name: sub-tool-implementer
+description: Build any of the 14 GBI 2026 sub-tools — Anthropic streaming text + fal.ai image/video generation + Apify data scraping + Hyperbrowser+Stagehand browser-driving + Stripe MCP financial data. Use on Days 3-4 to implement the live mode of every sub-tool.
+type: claude-code-skill
+---
+
+# Sub-Tool Implementer Skill
+
+Use this skill when the user asks to build, modify, or debug any of the 14 sub-tools in the live mode.
+
+## The 14 sub-tools
+
+| Wing | Sub-tool | Backend services | Skill backing |
+|---|---|---|---|
+| CMO | Instagram Creator | Anthropic + fal.ai Flux Pro | `caption-writer` |
+| CMO | LinkedIn Post | Anthropic + caption-writer skill | `caption-writer`, `linkedin-content-strategy` |
+| CMO | Article+Images | Vercel streamUI + Imagen via fal.ai | `content-creator` |
+| CMO | Video Generator | fal.ai Nano Banana 2 + Seedance 2.0 fast | none |
+| CRO | Lead Scraper | Hyperbrowser + Stagehand + Apify (Apollo) | `cold-outreach-sequence` |
+| CRO | Cold Email Writer | Hyperbrowser (profile pull) + Anthropic | `email-writer-taki-hormozi` |
+| CRO | Call Script | Anthropic | `closing-playbook`, `taki-moore-email` |
+| CRO | Follow-up Sequence | Anthropic | `email-writer-taki-hormozi` |
+| COO | Weekly Focus Report | Anthropic + Stripe MCP + activity feeds | `purely-personal:leadership-engine` |
+| COO | Daily 3-Priority | Anthropic + activity feeds | `purely-personal:leadership-engine` |
+| COO | Process Auditor | Anthropic + activity feeds | `purely-personal:operations-engine` |
+| CFO | Cash Forecast | Anthropic + Stripe MCP | `purely-personal:cash-engine` |
+| CFO | Pricing Optimizer | Anthropic | `pricing-strategy` |
+| CFO | P&L Snapshot | Stripe MCP + Anthropic synthesis | `purely-personal:cash-engine` |
+
+## Pattern 1: Anthropic streaming text (most CMO/CRO/COO/CFO tools)
+
+```ts
+// src/app/api/cmo/linkedin/route.ts
+import Anthropic from "@anthropic-ai/sdk";
+import { CMO_LINKEDIN_SYSTEM_PROMPT } from "@/lib/prompts/cmo-linkedin";
+
+const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+
+export async function POST(req: Request) {
+  const { topic } = await req.json();
+
+  const stream = client.messages.stream({
+    model: "claude-sonnet-4-5-20250929",
+    max_tokens: 1024,
+    system: [{
+      type: "text",
+      text: CMO_LINKEDIN_SYSTEM_PROMPT,    // load your caption-writer skill prompt
+      cache_control: { type: "ephemeral" } // 60% latency win on repeat calls
+    }],
+    messages: [{ role: "user", content: `Write a LinkedIn post about: ${topic}` }],
+  });
+
+  // Stream as SSE for the React component to consume
+  const encoder = new TextEncoder();
+  const readable = new ReadableStream({
+    async start(controller) {
+      for await (const event of stream) {
+        if (event.type === "content_block_delta" && event.delta.type === "text_delta") {
+          controller.enqueue(encoder.encode(`data: ${JSON.stringify({ text: event.delta.text })}\n\n`));
+        }
+      }
+      controller.close();
+    },
+  });
+
+  return new Response(readable, { headers: { "Content-Type": "text/event-stream" } });
+}
+```
+
+```tsx
+// src/components/tools/cmo/LinkedInPost.tsx
+"use client";
+import { useEffect, useState } from "react";
+import { SmoothText } from "flowtoken";
+
+export function LiveLinkedInPost({ topic }: { topic: string }) {
+  const [text, setText] = useState("");
+
+  useEffect(() => {
+    const eventSource = new EventSource(`/api/cmo/linkedin?topic=${encodeURIComponent(topic)}`);
+    eventSource.onmessage = (e) => setText(t => t + JSON.parse(e.data).text);
+    return () => eventSource.close();
+  }, [topic]);
+
+  return (
+    <div className="fixed inset-0 flex items-center justify-center bg-[#050810]">
+      <div className="max-w-4xl text-cyan-100">
+        <SmoothText animation="blurIn" animationDuration="600ms" text={text} />
+      </div>
+    </div>
+  );
+}
+```
+
+## Pattern 2: fal.ai video generation (CMO Video Generator)
+
+Pre-warm the connection on app boot. First real call is hot.
+
+```ts
+// src/app/api/cmo/video/route.ts
+import * as fal from "@fal-ai/serverless-client";
+
+fal.config({ credentials: process.env.FAL_KEY });
+
+export async function POST(req: Request) {
+  const { prompt } = await req.json();
+
+  // Step 1: Generate input image (Nano Banana 2)
+  const image = await fal.subscribe("fal-ai/nano-banana-2", {
+    input: { prompt, image_size: "landscape_16_9" },
+  });
+
+  // Step 2: Animate via Seedance 2.0 fast tier
+  const video = await fal.subscribe("fal-ai/seedance-2.0/fast", {
+    input: {
+      image_url: image.data.images[0].url,
+      prompt,
+      duration: 5,
+      resolution: "720p",
+      generate_audio: false,
+    },
+  });
+
+  return Response.json({ videoUrl: video.data.video.url });
+}
+```
+
+## Pattern 3: Hyperbrowser + Stagehand (CRO Lead Scraper)
+
+This is the most visually impressive sub-tool. Audience watches a real Chromium browser navigate LinkedIn.
+
+```ts
+// src/app/api/cro/leads/route.ts
+import { Hyperbrowser } from "@hyperbrowser/sdk";
+import { Stagehand } from "stagehand-ai";
+
+const hb = new Hyperbrowser({ apiKey: process.env.HYPERBROWSER_KEY });
+
+export async function POST(req: Request) {
+  const { searchQuery } = await req.json();
+
+  const session = await hb.sessions.create({ stealth: true, keepAlive: true });
+
+  const stagehand = new Stagehand({ env: "BROWSERBASE", sessionId: session.id });
+  await stagehand.init();
+
+  // Natural-language browser instructions
+  await stagehand.page.goto("https://linkedin.com/sales/search/people");
+  await stagehand.act(`Search for: ${searchQuery}`);
+  
+  const leads = await stagehand.extract({
+    instruction: "Get the first 50 search results: name, title, company, location",
+    schema: { type: "array", items: { type: "object", properties: { name: "string", title: "string", company: "string", location: "string" }}}
+  });
+
+  return Response.json({ liveUrl: session.liveUrl, leads });
+}
+```
+
+```tsx
+// src/components/tools/cro/LeadScraper.tsx
+"use client";
+import { useEffect, useState } from "react";
+
+export function LiveLeadScraper({ query }: { query: string }) {
+  const [leads, setLeads] = useState<Lead[]>([]);
+  const [liveUrl, setLiveUrl] = useState<string | null>(null);
+
+  useEffect(() => {
+    fetch("/api/cro/leads", { method: "POST", body: JSON.stringify({ searchQuery: query }) })
+      .then(r => r.json())
+      .then(({ liveUrl, leads }) => {
+        setLiveUrl(liveUrl);
+        // Drop leads in one-by-one for Bloomberg-ticker effect
+        leads.forEach((lead, i) => {
+          setTimeout(() => setLeads(prev => [...prev, lead]), i * 800);
+        });
+      });
+  }, [query]);
+
+  return (
+    <div className="fixed inset-0 grid grid-cols-[2fr_1fr]">
+      {/* Left: Hyperbrowser liveUrl iframe (audience watches) */}
+      <iframe src={liveUrl ?? ""} className="w-full h-full border-r-2 border-cyan-500" />
+      
+      {/* Right: lead rows ticker-drop in */}
+      <div className="bg-black p-8 overflow-y-auto">
+        {leads.map((lead, i) => (
+          <motion.div
+            key={i}
+            initial={{ opacity: 0, x: 100 }}
+            animate={{ opacity: 1, x: 0 }}
+            className="border-b border-cyan-700 py-4"
+          >
+            <div className="text-2xl text-cyan-100">{lead.name}</div>
+            <div className="text-xl text-cyan-300">{lead.title} · {lead.company}</div>
+          </motion.div>
+        ))}
+      </div>
+    </div>
+  );
+}
+```
+
+## Pattern 4: Apify parallel actors (CMO/COO research)
+
+```ts
+// src/app/api/coo/audit/route.ts
+import { ApifyClient } from "apify-client";
+
+const apify = new ApifyClient({ token: process.env.APIFY_TOKEN });
+
+export async function POST(req: Request) {
+  // Fire 3 actors in parallel for the "war room" feel
+  const [reddit, x, web] = await Promise.all([
+    apify.actor("trudax/reddit-scraper-lite").call({ searchTerms: ["my-business-name"] }),
+    apify.actor("apidojo/tweet-scraper").call({ searchTerms: ["my-business-name"] }),
+    apify.actor("apify/rag-web-browser").call({ query: "my-business-name reviews" }),
+  ]);
+
+  // Synthesize via Anthropic
+  const synthesis = await anthropic.messages.create({
+    model: "claude-sonnet-4-5-20250929",
+    max_tokens: 2048,
+    system: [{ type: "text", text: COO_AUDIT_SYSTEM_PROMPT, cache_control: { type: "ephemeral" }}],
+    messages: [{ role: "user", content: JSON.stringify({ reddit, x, web }) }],
+  });
+
+  return Response.json({ rawData: { reddit, x, web }, insights: synthesis.content });
+}
+```
+
+## Pattern 5: Stripe MCP (CFO wing)
+
+The CFO wing pulls real Stripe data. If you don't have a real Stripe account ready for the demo, fake mode plays the pre-recorded MP4 — no audience knows.
+
+```ts
+// CFO sub-tools call Stripe MCP via MCP tool use
+// (already configured in your stack — see your existing Stripe MCP integration)
+const balance = await stripe.retrieveBalance();
+const invoices = await stripe.listInvoices({ limit: 100 });
+const subscriptions = await stripe.listSubscriptions({ limit: 50 });
+
+// Then synthesize via Anthropic with prompt-cached CFO system prompt
+```
+
+## Acceptance criteria (Day 3-4 deliverable)
+- [ ] All 14 sub-tools work end-to-end in `live` mode in dev
+- [ ] Each sub-tool completes in <2 minutes worst case
+- [ ] Each sub-tool has corresponding `fake` mode that loads `/public/fallback/[wing]-[tool].mp4`
+- [ ] Each sub-tool has corresponding `safe` mode that loads `/public/safe/[wing]-[tool]-still.png`
+- [ ] Anthropic prompt caching is on every system prompt (60% latency win)
+- [ ] fal.ai pre-warm call fires on app boot
+- [ ] Hyperbrowser session created on demand (Lead Scraper) and pre-warmed 5 minutes before show
+
+If all 7 pass, the live mode of GBI 2026 is functional. Days 5-6 polish the visual layer.

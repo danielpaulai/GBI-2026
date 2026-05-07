@@ -1,0 +1,218 @@
+---
+description: Apply Hollywood-grade visual polish — WebGL LUT shader (Blade Runner 2049 grade), HolyGrain 35mm film grain overlay, CSS radial vignette, audio bed mixing. Invoke on Day 2 (highest-ROI) and Day 6 (final polish).
+alwaysApply: false
+---
+
+
+# Cinematic Polish Skill
+
+Use this skill when the user asks to apply Hollywood-grade polish — color grading, film grain, vignette, or audio mixing.
+
+## The single highest-ROI move
+
+`mattdesl/glsl-lut` + IWLTBAP Blade Runner 2049 LUT + HolyGrain 35mm grain + CSS radial vignette. ~80 LOC. ~4 hours. Audience reaction shifts from "nice website" to "is this a movie?" Build this Day 2 before anything else.
+
+## Required asset downloads (do this first)
+
+1. **LUT file:** Download from [luts.iwltbap.com](https://luts.iwltbap.com) — pick "Blade Runner 2049" pack. Need the `.cube` file. Convert to `.png` LUT image (HALD format, 33×33×33 unwrapped to 1089×33 PNG) using [LUT Converter](https://github.com/mattdesl/lut-converter) or via a `.cube → .png` online tool.
+2. **Film grain:** Download from [holygrain.com/free-film-grain-download](https://www.holygrain.com/free-film-grain-download/). Pick "35mm Grain Pack". Drop the .mov file into `/public/grain/35mm-overlay.webm` (transcode to WebM via FFmpeg: `ffmpeg -i 35mm.mov -c:v libvpx-vp9 -b:v 2M 35mm-overlay.webm`).
+3. **Audio bed:** Subscribe to [Musicbed](https://www.musicbed.com). Pull 3 tracks from Tony Anderson, Christoffer Moe Ditlevsen, Gavin Luke, or Hill. Save as `/public/audio/bed-anticipation.mp3`, `bed-build.mp3`, `bed-resolution.mp3`.
+
+## The implementation
+
+### Step 1: Color-graded video backdrop
+
+```tsx
+// src/components/chrome/ColorGradedVideo.tsx
+"use client";
+import { useEffect, useRef } from "react";
+import createLUT from "glsl-lut";
+import REGL from "regl";
+
+export function ColorGradedVideo({ src }: { src: string }) {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
+
+  useEffect(() => {
+    if (!canvasRef.current || !videoRef.current) return;
+    const regl = REGL({ canvas: canvasRef.current });
+    
+    const lutTexture = regl.texture({ src: "/luts/blade-runner-2049.png" });
+    const videoTexture = regl.texture(videoRef.current);
+    
+    const drawLUT = createLUT({
+      regl,
+      texture: videoTexture,
+      lut: lutTexture,
+    });
+
+    const tick = () => {
+      videoTexture.subimage(videoRef.current!);
+      drawLUT();
+      requestAnimationFrame(tick);
+    };
+    tick();
+  }, [src]);
+
+  return (
+    <>
+      <video 
+        ref={videoRef} 
+        src={src} 
+        autoPlay muted loop playsInline 
+        className="hidden"
+      />
+      <canvas ref={canvasRef} className="fixed inset-0 w-screen h-screen object-cover" />
+    </>
+  );
+}
+```
+
+### Step 2: Film grain + vignette overlays
+
+```tsx
+// src/components/chrome/CinematicOverlays.tsx
+export function CinematicOverlays() {
+  return (
+    <>
+      {/* Film grain — actual 35mm scan, not CSS noise */}
+      <video
+        src="/grain/35mm-overlay.webm"
+        autoPlay muted loop playsInline
+        className="fixed inset-0 w-screen h-screen pointer-events-none"
+        style={{ mixBlendMode: "overlay", opacity: 0.15 }}
+      />
+      
+      {/* Radial vignette — pure CSS, 6 lines */}
+      <div
+        className="fixed inset-0 pointer-events-none"
+        style={{
+          background: "radial-gradient(ellipse at center, transparent 40%, rgba(0,0,0,0.6) 100%)",
+          mixBlendMode: "multiply",
+        }}
+      />
+    </>
+  );
+}
+```
+
+### Step 3: Stack them in the layout
+
+```tsx
+// src/app/layout.tsx
+<body className="bg-[#050810]">
+  <ColorGradedVideo src="/backdrops/idle.mp4" />
+  <CinematicOverlays />
+  <BootSequence />
+  <main>{children}</main>
+</body>
+```
+
+## The audio mix (3-layer architecture)
+
+```ts
+// src/lib/audio.ts
+import { Howl } from "howler";
+
+// LAYER 1: Hero ambient bed (always playing, -22dB)
+export const ambientBed = new Howl({
+  src: ["/audio/bed-anticipation.mp3"],
+  loop: true,
+  volume: 0.12, // -22dB
+});
+
+// LAYER 2: Act-specific swells (-15dB at peaks)
+export const stinger = new Howl({
+  src: ["/audio/stinger-wing-transition.mp3"], // 1.5s Udio-generated
+  volume: 0.32, // -10dB
+});
+
+// LAYER 3: Howler SFX sprite
+export const sfx = new Howl({
+  src: ["/audio/ui-sprite.mp3"],
+  sprite: {
+    press:    [0,    300],
+    confirm:  [400,  500],
+    hover:    [1000, 200],
+    whoosh:   [1300, 1200],
+    comms:    [2600, 800],
+    boot:     [3500, 3000],
+    error:    [6600, 400],
+    hum:      [7100, 12000, true], // looping
+  },
+  volume: 0.4, // -8dB
+});
+
+// Audio leads visual by 60ms — call this BEFORE the visual change
+export function playSfx(sound: keyof typeof sfx._sprite) {
+  sfx.play(sound);
+  return new Promise(r => setTimeout(r, 60));
+}
+```
+
+## The Mission Impossible countdown (45-second video gen filler)
+
+When the Video Generator sub-tool runs, fill the 45-second wait with cinematic tension:
+
+```tsx
+// src/components/tools/cmo/VideoCountdown.tsx
+import { motion } from "motion/react";
+import { DecryptedText } from "@/components/chrome/DecryptedText"; // from shadcn.io
+
+const statusMessages = [
+  "INITIALIZING DIFFUSION MODEL...",
+  "FRAMES ANALYZED: 247 / 720",
+  "COMPOSITING PASS 3 OF 7",
+  "RENDERING SHOT 02...",
+  "COLOR GRADING APPLIED",
+  "FINAL OUTPUT: 89%",
+];
+
+export function VideoCountdown({ onComplete }: { onComplete: () => void }) {
+  return (
+    <div className="fixed inset-0 flex items-center justify-center">
+      {/* Layer 1: Decrypt status text (cycles every 4s) */}
+      <DecryptedText text={statusMessages} interval={4000} />
+
+      {/* Layer 2: Radial countdown ring */}
+      <motion.svg className="w-96 h-96">
+        <motion.circle
+          cx="50%" cy="50%" r="45%"
+          stroke="#00d4ff" strokeWidth="4" fill="none"
+          initial={{ pathLength: 1 }}
+          animate={{ pathLength: 0 }}
+          transition={{ duration: 45, ease: "linear" }}
+          style={{ filter: "drop-shadow(0 0 20px #00d4ff)" }}
+        />
+      </motion.svg>
+
+      {/* Layer 3: Audio waveform visualizer (Tone.js analyzer of ambientBed) */}
+      <WaveformCanvas />
+    </div>
+  );
+}
+```
+
+## Acceptance criteria (Day 2 deliverable)
+- [ ] One Seedance backdrop clip displayed through `ColorGradedVideo`
+- [ ] Film grain overlay visible at 15% opacity
+- [ ] Radial vignette darkens corners
+- [ ] Ambient bed plays at -22dB (audible but never dominant)
+- [ ] SFX sprite tested — press, confirm, comms-ping all working
+- [ ] Audio leads visual by 60ms on press handlers
+
+If all 6 pass, walk into another room, look at the screen from 25 feet — does it look like a website or a movie? That's the test.
+
+## The Hollywood checklist (run before every act)
+
+Before any beat ships, walk through these 9 questions. If any answer is no, fix it.
+
+1. Is there a film reference for every visible element?
+2. Is the ambient bed playing under everything?
+3. Is there a single focal point per moment, or am I splitting attention?
+4. Does typography read from the back row of the venue (body 64pt+)?
+5. Are colors graded (cyan/amber/void only)?
+6. Does the SFX lead the visual by 60ms?
+7. Does the entrance animation use expo-out, not linear?
+8. Is ≥40% of the screen empty (negative space rule)?
+9. Would Perception Studio ship this for Iron Man Mark VII?

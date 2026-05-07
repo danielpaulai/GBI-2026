@@ -1,0 +1,161 @@
+---
+name: voice-grammar-builder
+description: Define the Picovoice Rhino voice intent grammar for GBI 2026 — 20 phrases mapped to XState events, on-device, <100ms latency, no internet hop. Use on Day 2 when wiring voice triggers, or to add/modify intents later.
+type: claude-code-skill
+---
+
+# Voice Grammar Builder Skill
+
+Use this skill when the user asks to set up voice triggers, define new intents, or troubleshoot Picovoice Rhino.
+
+## Why Picovoice Rhino (not Whisper, not Web Speech API)
+
+- **On-device** — no internet hop, no cloud dependency on stage
+- **<100ms latency** — Whisper streaming is 300-500ms; Web Speech API varies wildly
+- **Grammar-locked** — Rhino returns named intents from a pre-defined grammar. No fuzzy matching, no transcription post-processing.
+- **Free tier covers a stage demo** — you'll hit zero rate limits in a 4-hour show
+
+## The 20-intent grammar (canonical)
+
+Define this in [Picovoice Console](https://console.picovoice.ai). The output is a `.rhn` file you ship to `/public/voice/gbi-2026.rhn`.
+
+### Wing-opening intents (4)
+| Phrase | Intent name | XState event |
+|---|---|---|
+| "open marketing" / "marketing go" / "show marketing" | `openMarketing` | `OPEN_CMO` |
+| "open sales" / "sales go" / "show sales" | `openSales` | `OPEN_CRO` |
+| "open operations" / "operations go" / "show ops" | `openOperations` | `OPEN_COO` |
+| "open finance" / "finance go" / "show finance" | `openFinance` | `OPEN_CFO` |
+
+### Sub-tool runtime intents (14)
+| Phrase | Intent name | When |
+|---|---|---|
+| "run instagram" / "create post" | `runInstagram` | CMO wing open |
+| "run linkedin" / "linkedin post" | `runLinkedIn` | CMO wing open |
+| "run article" / "write article" | `runArticle` | CMO wing open |
+| "run video" / "make video" | `runVideo` | CMO wing open |
+| "run leads" / "find leads" | `runLeads` | CRO wing open |
+| "run email" / "cold email" | `runEmail` | CRO wing open |
+| "run script" / "call script" | `runScript` | CRO wing open |
+| "run sequence" / "follow up" | `runSequence` | CRO wing open |
+| "run weekly" / "weekly report" | `runWeekly` | COO wing open |
+| "run daily" / "daily plan" | `runDaily` | COO wing open |
+| "run audit" / "process audit" | `runAudit` | COO wing open |
+| "run cashflow" / "cash forecast" | `runCashflow` | CFO wing open |
+| "run pricing" / "pricing optimizer" | `runPricing` | CFO wing open |
+| "run pnl" / "profit loss" | `runPnL` | CFO wing open |
+
+### Navigation intents (3)
+| Phrase | Intent name | XState event |
+|---|---|---|
+| "back" / "go back" | `back` | `BACK` |
+| "home" / "reset to home" | `home` | `HOME` |
+| "reset everything" / "start over" | `reset` | `RESET` |
+
+### Total: 21 phrases, ~50-60 spoken variations
+
+## The Picovoice Console steps
+
+1. Sign up at [console.picovoice.ai](https://console.picovoice.ai). Free tier sufficient.
+2. Get your **AccessKey** (one per device — activate the AccessKey on the stage MacBook AT LEAST 7 days early; first activation requires internet).
+3. Create a new Rhino context. Pick "English".
+4. Add slots:
+   - `wing`: marketing, sales, operations, finance
+   - `tool`: instagram, linkedin, article, video, leads, email, script, sequence, weekly, daily, audit, cashflow, pricing, pnl
+5. Add intents (use `$slot:wing` template):
+   - `openWing` → "open $wing", "$wing go", "show $wing"
+   - `runTool` → "run $tool", "execute $tool"
+   - `back`, `home`, `reset`
+6. Train the model. Download the `.rhn` file.
+7. Save to `/public/voice/gbi-2026.rhn`.
+
+## The wake word (Porcupine)
+
+Picovoice Porcupine gates Rhino against ambient speech (audience noise, presenter narration). Use a custom wake word: **"Hey GBI"**.
+
+Train via [console.picovoice.ai/ppn](https://console.picovoice.ai/ppn) → "Create Custom Wake Word" → record "hey GBI" 3 times → download `.ppn` file → save to `/public/voice/hey-gbi.ppn`.
+
+## The React integration
+
+```tsx
+// src/lib/triggers/voice.ts
+"use client";
+import { useEffect } from "react";
+import { usePorcupine } from "@picovoice/porcupine-react";
+import { useRhino } from "@picovoice/rhino-react";
+import { stageActor } from "@/lib/machine";
+
+const accessKey = process.env.NEXT_PUBLIC_PICOVOICE_ACCESS_KEY!;
+
+const intentToEvent = {
+  openMarketing: "OPEN_CMO",
+  openSales: "OPEN_CRO",
+  openOperations: "OPEN_COO",
+  openFinance: "OPEN_CFO",
+  back: "BACK",
+  home: "HOME",
+  reset: "RESET",
+  // runTool intents need slot extraction — see below
+};
+
+export function useVoiceTriggers() {
+  const { keywordDetection } = usePorcupine();
+  const { inference, init: initRhino, process: processRhino, release } = useRhino();
+
+  // Initialize Porcupine (always listening for wake word)
+  useEffect(() => {
+    initPorcupine(accessKey, [{ publicPath: "/voice/hey-gbi.ppn", label: "hey-gbi" }]);
+  }, []);
+
+  // When wake word detected, activate Rhino for one inference
+  useEffect(() => {
+    if (keywordDetection !== null) {
+      initRhino(accessKey, { publicPath: "/voice/gbi-2026.rhn" });
+    }
+  }, [keywordDetection]);
+
+  // When Rhino returns an intent, dispatch
+  useEffect(() => {
+    if (!inference || !inference.isUnderstood) return;
+
+    const event = intentToEvent[inference.intent];
+    if (event) {
+      stageActor.send({ type: event });
+      return;
+    }
+
+    // Handle runTool with slot extraction
+    if (inference.intent === "runTool" && inference.slots?.tool) {
+      stageActor.send({ type: "RUN_TOOL", toolId: inference.slots.tool });
+    }
+
+    release(); // release Rhino, return to Porcupine listening
+  }, [inference]);
+}
+```
+
+## Stage rehearsal — voice reliability test
+
+Before May 14, do this in a noisy room:
+1. Open YouTube clip of "noisy auditorium ambient" (search "1000 person audience chatter") at 70dB
+2. Try to trigger each of the 21 phrases 5 times
+3. **Acceptance:** ≥90% recognition rate for each phrase
+4. If a phrase fails repeatedly, retrain it with more sample variations
+
+## Stage failure recovery
+
+If voice fails entirely on stage:
+- **Cmd+T** — toggle "type instead of speak" — presenter types intent directly
+- **Logitech R400** — physical clicker advances to next state
+- **Streamdeck Mini** — labeled buttons trigger wings directly
+- **Keyboard** — M/S/O/F → wings, Space → run tool, Esc → back
+
+All 4 fallbacks work because they all dispatch the same XState events.
+
+## Acceptance criteria
+- [ ] AccessKey activated on stage MacBook ≥7 days before show
+- [ ] `.rhn` file in `/public/voice/gbi-2026.rhn`
+- [ ] `.ppn` wake word file in `/public/voice/hey-gbi.ppn`
+- [ ] All 21 phrases recognized in quiet room
+- [ ] All 21 phrases ≥90% recognized in 70dB ambient noise
+- [ ] Lavalier mic on PRESENTER, not volunteer (volunteers' voices pick up on lavaliers fine)

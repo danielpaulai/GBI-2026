@@ -1,0 +1,124 @@
+---
+description: Build a GBI 2026 wing component (CMO/CRO/COO/CFO) with sub-tools, Arwes octagon chrome, Framer Motion layoutId morph, XState integration. Invoke when implementing any of the 4 wings.
+alwaysApply: false
+---
+
+
+# Wing Component Builder
+
+Use this skill when the user asks to build, modify, or debug a wing — CMO (Marketing), CRO (Sales/Revenue), COO (Operations), or CFO (Finance).
+
+## Wing structure (canonical)
+
+Each wing has 3 layers:
+1. **Wing core** — the depth-1 panel that opens when the wing is selected
+2. **Sub-tool tiles** — the 3-4 sub-tools in this wing, tiled around the core
+3. **Sub-tool runtime** — depth-2 fullscreen views, one per sub-tool
+
+## File pattern (use for every wing)
+
+```
+src/components/wings/CmoWing.tsx          # Wing panel (depth 1)
+src/components/tools/cmo/
+  ├── InstagramCreator.tsx                # Depth 2 fullscreen
+  ├── LinkedInPost.tsx
+  ├── ArticleCanvas.tsx
+  └── VideoGenerator.tsx
+src/app/api/cmo/
+  ├── instagram/route.ts                  # Live API endpoint
+  ├── linkedin/route.ts
+  ├── article/route.ts
+  └── video/route.ts
+```
+
+## The wing component template
+
+```tsx
+// src/components/wings/CmoWing.tsx
+"use client";
+import { motion } from "motion/react";
+import { FrameSVGOctagon } from "@arwes/react";
+import { useSelector } from "@xstate/react";
+import { stageActor } from "@/lib/machine";
+import { InstagramCreator } from "@/components/tools/cmo/InstagramCreator";
+import { LinkedInPost } from "@/components/tools/cmo/LinkedInPost";
+import { ArticleCanvas } from "@/components/tools/cmo/ArticleCanvas";
+import { VideoGenerator } from "@/components/tools/cmo/VideoGenerator";
+
+const tools = [
+  { id: "instagram", label: "INSTAGRAM",       icon: "/lottie/cmo-ig.lottie",        component: InstagramCreator },
+  { id: "linkedin",  label: "LINKEDIN",        icon: "/lottie/cmo-linkedin.lottie",  component: LinkedInPost },
+  { id: "article",   label: "ARTICLE+IMAGES",  icon: "/lottie/cmo-article.lottie",   component: ArticleCanvas },
+  { id: "video",     label: "VIDEO",           icon: "/lottie/cmo-video.lottie",     component: VideoGenerator },
+];
+
+export function CmoWing() {
+  const activeTool = useSelector(stageActor, (s) => s.context.activeTool);
+  const ActiveComponent = tools.find(t => t.id === activeTool)?.component;
+
+  if (activeTool && ActiveComponent) {
+    return (
+      <motion.div
+        layoutId={`tool-${activeTool}`}
+        className="fixed inset-0 z-50"
+        transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+      >
+        <ActiveComponent />
+      </motion.div>
+    );
+  }
+
+  return (
+    <motion.div
+      layoutId="wing-cmo"
+      className="fixed inset-0 z-40 flex items-center justify-center"
+      transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+    >
+      <FrameSVGOctagon
+        style={{ '--arwes-frames-line-color': '#00d4ff' } as any}
+        className="w-[90vw] h-[80vh]"
+      />
+      <div className="absolute inset-0 grid grid-cols-2 grid-rows-2 gap-8 p-16">
+        {tools.map(tool => (
+          <motion.button
+            key={tool.id}
+            layoutId={`tool-${tool.id}`}
+            onClick={() => stageActor.send({ type: "RUN_TOOL", toolId: tool.id })}
+            className="border border-cyan-400/40 bg-black/60 hover:bg-cyan-950/40 transition-all"
+          >
+            <h2 className="text-6xl font-bold text-cyan-100">{tool.label}</h2>
+          </motion.button>
+        ))}
+      </div>
+    </motion.div>
+  );
+}
+```
+
+## Wing-specific configurations
+
+| Wing | Color accent | Sub-tools | Skill backing |
+|---|---|---|---|
+| **CMO (Marketing)** | Cyan `#00d4ff` | Instagram · LinkedIn · Article+Images · Video | `ai-cmo`, `caption-writer` |
+| **CRO (Sales/Revenue)** | Amber `#ffa500` | Lead Scraper · Cold Email · Call Script · Follow-up | `ai-cro`, `cold-outreach-sequence` |
+| **COO (Operations)** | Cyan-violet `#7eccff` | Weekly Focus · Daily 3-Priority · Process Auditor | `ai-coo`, `purely-personal:operations-engine` |
+| **CFO (Finance)** | Amber-gold `#ffcc44` | Cash Forecast · Pricing Optimizer · P&L Snapshot | `ai-cfo`, `purely-personal:cash-engine` |
+
+## The CFO surprise reveal (Act 3 only)
+
+CFO wing stays HIDDEN through Acts 1 and 2. In code:
+```tsx
+const [cfoRevealed, setCfoRevealed] = useState(false);
+// Triggered only when XState enters the act3 superstate
+```
+
+When Act 3 begins, CFO wing illuminates **for the first time**. Audience reacts: "wait, there's a 4th one?" That moment is the dramatic gold.
+
+## Acceptance criteria for each wing
+- [ ] Layout passes the 50ft test (body 64pt, headlines 96-128pt)
+- [ ] Wing opens with smooth layoutId morph from depth 0 → 1
+- [ ] Each sub-tool opens fullscreen with layoutId morph from depth 1 → 2
+- [ ] Esc returns from sub-tool → wing → idle
+- [ ] All 3 modes (live/fake/safe) work for every sub-tool
+- [ ] Wing-color accent applied to chrome (don't break the cyan/amber rule)
+- [ ] Movie-reference test: every visible element traces to Iron Man / Tron / Blade Runner / Mission Impossible / Apple Vision Pro

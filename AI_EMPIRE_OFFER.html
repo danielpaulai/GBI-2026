@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>10X With AI — Special Offer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  @page { size: A4; margin: 0; }
+
+  html, body {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+    color-adjust: exact;
+  }
+
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    color: #fff;
+    background: #1a1a1a;
+    line-height: 1.4;
+  }
+
+  .page {
+    width: 210mm;
+    height: 297mm;
+    margin: 0 auto;
+    background:
+      radial-gradient(ellipse at top right, #4a0d10 0%, #1a0204 45%, #0a0000 100%);
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* HERO — name dominates */
+  .hero {
+    padding: 6mm 14mm 3mm;
+    position: relative;
+    flex-shrink: 0;
+    min-height: 62mm;
+  }
+
+  .hero .offer-name {
+    font-weight: 900;
+    font-size: 72pt;
+    line-height: 0.95;
+    letter-spacing: -0.04em;
+    color: #ec4357;
+    text-transform: uppercase;
+    margin-bottom: 3mm;
+    text-shadow: 0 0 30px rgba(236,67,87,0.4);
+    max-width: 160mm;
+    white-space: nowrap;
+    position: relative;
+    z-index: 3;
+  }
+
+  .hero .offer-subtitle {
+    font-weight: 700;
+    font-size: 11.5pt;
+    line-height: 1.25;
+    color: #fff;
+    max-width: 130mm;
+    font-style: italic;
+  }
+
+  .photo {
+    position: absolute;
+    top: 0;
+    right: 4mm;
+    width: 62mm;
+    height: 82mm;
+    background-image: url('danny-nobg.png');
+    background-size: contain;
+    background-position: center bottom;
+    background-repeat: no-repeat;
+    filter: drop-shadow(0 0 25px rgba(236, 67, 87, 0.25));
+  }
+
+  /* OUTCOMES STRIP */
+  .outcomes {
+    margin: 0 14mm;
+    background: rgba(236, 67, 87, 0.12);
+    border-top: 1pt solid rgba(236, 67, 87, 0.5);
+    border-bottom: 1pt solid rgba(236, 67, 87, 0.5);
+    padding: 3mm 4mm;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    flex-shrink: 0;
+  }
+
+  .outcome { text-align: center; }
+  .outcome .num {
+    font-weight: 900;
+    font-size: 16pt;
+    color: #ec4357;
+    line-height: 1;
+  }
+  .outcome .label {
+    font-size: 7.5pt;
+    color: #d8d8d8;
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    margin-top: 1mm;
+  }
+  .outcome .divider {
+    width: 1px;
+    height: 9mm;
+    background: rgba(255,255,255,0.15);
+  }
+
+  /* SECTION TITLES */
+  .section-title {
+    padding: 2.5mm 14mm 1.5mm;
+    font-weight: 900;
+    font-size: 12pt;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    flex-shrink: 0;
+  }
+
+  .fast-action-title {
+    padding: 1.5mm 14mm 1mm;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    gap: 3mm;
+  }
+  .fast-action-title .label {
+    background: linear-gradient(90deg, #fbbf24 0%, #f59e0b 100%);
+    color: #1a0204;
+    padding: 1.2mm 2.5mm;
+    border-radius: 1.5mm;
+    font-weight: 900;
+    font-size: 8.5pt;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  .fast-action-title .text {
+    font-weight: 800;
+    font-size: 10.5pt;
+    color: #fbbf24;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+  }
+
+  /* BONUSES */
+  .bonuses {
+    padding: 0 14mm;
+    display: flex;
+    flex-direction: column;
+    gap: 0.9mm;
+    flex-shrink: 0;
+  }
+
+  .bonus {
+    display: flex;
+    align-items: stretch;
+    background: rgba(15, 5, 5, 0.85);
+    border: 1pt solid #ec4357;
+    border-radius: 2mm;
+    overflow: hidden;
+    min-height: 7.2mm;
+    position: relative;
+    z-index: 2;
+  }
+
+  .bonus.gold {
+    border: 1.5pt solid #fbbf24;
+    background: rgba(40, 28, 5, 0.75);
+  }
+
+  .bonus-content {
+    flex: 1;
+    padding: 1mm 3.5mm;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .bonus-name {
+    font-weight: 800;
+    font-size: 9.5pt;
+    line-height: 1.12;
+    color: #fff;
+    margin-bottom: 0.2mm;
+  }
+
+  .bonus-desc {
+    font-size: 7.8pt;
+    line-height: 1.25;
+    color: #c8c8c8;
+    font-weight: 400;
+  }
+
+  .bonus-price {
+    background: linear-gradient(90deg, #ec4357 0%, #d92e44 100%);
+    color: #fff;
+    width: 28mm;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 900;
+    font-size: 14.5pt;
+    letter-spacing: -0.02em;
+  }
+
+  .bonus.gold .bonus-price {
+    background: linear-gradient(90deg, #fbbf24 0%, #f59e0b 100%);
+    color: #1a0204;
+  }
+
+  /* DEPLOYMENT PROMISE */
+  .promise {
+    margin: 2mm 14mm 0;
+    border: 1.2pt solid #fbbf24;
+    background: linear-gradient(90deg, rgba(251,191,36,0.12), rgba(245,158,11,0.06));
+    border-radius: 2mm;
+    padding: 1.8mm 3.5mm;
+    flex-shrink: 0;
+  }
+  .promise .ptitle {
+    font-weight: 900;
+    font-size: 9pt;
+    color: #fbbf24;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    margin-bottom: 0.5mm;
+  }
+  .promise .pbody {
+    font-size: 8pt;
+    line-height: 1.3;
+    color: #fff;
+    font-weight: 500;
+  }
+
+  /* TOTALS */
+  .totals-block {
+    padding: 2.2mm 14mm 0.5mm;
+    text-align: center;
+    flex-shrink: 0;
+    margin-top: auto;
+  }
+
+  .total-value {
+    font-weight: 900;
+    font-size: 12pt;
+    color: #ec4357;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    margin-bottom: 0.5mm;
+  }
+
+  .roi-math {
+    font-size: 8.3pt;
+    color: #d8d8d8;
+    font-weight: 500;
+    margin-bottom: 1mm;
+  }
+  .roi-math .accent {
+    color: #fbbf24;
+    font-weight: 700;
+  }
+
+  .special-offer {
+    font-weight: 900;
+    font-size: 19pt;
+    color: #fff;
+    letter-spacing: 0.01em;
+    text-transform: uppercase;
+    line-height: 1.05;
+  }
+  .special-offer .price { color: #ec4357; }
+
+  .urgency {
+    margin-top: 1.2mm;
+    font-size: 8.8pt;
+    color: #fff;
+    font-weight: 700;
+    line-height: 1.25;
+  }
+
+  .regret {
+    margin-top: 0.8mm;
+    font-size: 7.8pt;
+    color: #fbbf24;
+    font-weight: 500;
+    font-style: italic;
+    line-height: 1.25;
+  }
+
+  /* BRAND FOOTER */
+  .brand-footer {
+    padding: 1.8mm 14mm 2mm;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 6.8pt;
+    color: rgba(255,255,255,0.55);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    font-weight: 600;
+    flex-shrink: 0;
+  }
+  .brand-footer .brand {
+    color: #ec4357;
+    font-weight: 800;
+    letter-spacing: 0.2em;
+  }
+
+  @media print {
+    body { background: #000; }
+    .page { box-shadow: none; }
+  }
+
+  @media screen {
+    body { padding: 24px 16px; background: #2a2a2a; }
+    .page { box-shadow: 0 12px 50px rgba(0,0,0,0.6); }
+  }
+</style>
+</head>
+<body>
+
+<div class="page">
+
+  <div class="hero">
+    <div class="photo"></div>
+    <div class="offer-name">10X With AI</div>
+    <div class="offer-subtitle">10X Your Income. 10X Your Business. 10X Your Life. With AI Employees.</div>
+  </div>
+
+  <div class="section-title">What You Get:</div>
+
+  <div class="bonuses">
+
+    <div class="bonus">
+      <div class="bonus-content">
+        <div class="bonus-name">Pre-Bootcamp Intensive</div>
+        <div class="bonus-desc">2 days live with Danny. Map your business. Walk in lost. Walk out with a plan.</div>
+      </div>
+      <div class="bonus-price">$1,997</div>
+    </div>
+
+    <div class="bonus">
+      <div class="bonus-content">
+        <div class="bonus-name">3-Week Bootcamp</div>
+        <div class="bonus-desc">15 hours live with Danny. Teach. Implement. Execute. The AI systems built with you in real time.</div>
+      </div>
+      <div class="bonus-price">$4,997</div>
+    </div>
+
+    <div class="bonus">
+      <div class="bonus-content">
+        <div class="bonus-name">3-Week Live Accelerator</div>
+        <div class="bonus-desc">Live Q&amp;A with Danny. Every week. Bring your problems. Walk out unblocked.</div>
+      </div>
+      <div class="bonus-price">$2,997</div>
+    </div>
+
+    <div class="bonus">
+      <div class="bonus-content">
+        <div class="bonus-name">The 10X Accelerator. 3 Months Implementation Support.</div>
+        <div class="bonus-desc">Direct WhatsApp access to Danny and the team. Reviews. Implementation setup. Q&amp;A. Doubts. Until your AI is deployed in your business.</div>
+      </div>
+      <div class="bonus-price">$2,497</div>
+    </div>
+
+    <div class="bonus">
+      <div class="bonus-content">
+        <div class="bonus-name">AI CEO Brain</div>
+        <div class="bonus-desc">The exact AI brain Danny uses every Monday to run his business. Plug it in. Yours forever.</div>
+      </div>
+      <div class="bonus-price">$2,997</div>
+    </div>
+
+    <div class="bonus">
+      <div class="bonus-content">
+        <div class="bonus-name">4 AI Executives</div>
+        <div class="bonus-desc">The same AI agents Danny uses for marketing, sales, ops and finance. Already built. Yours.</div>
+      </div>
+      <div class="bonus-price">$4,997</div>
+    </div>
+
+    <div class="bonus">
+      <div class="bonus-content">
+        <div class="bonus-name">Founder OS. 3 Months Free Access.</div>
+        <div class="bonus-desc">Danny's custom platform for content, social media thumbnails, LinkedIn and scheduling. The same SaaS he ships every post with.</div>
+      </div>
+      <div class="bonus-price">$2,997</div>
+    </div>
+
+    <div class="bonus">
+      <div class="bonus-content">
+        <div class="bonus-name">100+ AI Skills</div>
+        <div class="bonus-desc">The exact AI skills Danny uses to grow his business and his clients'. 100+ plug-and-play.</div>
+      </div>
+      <div class="bonus-price">$3,997</div>
+    </div>
+
+    <div class="bonus">
+      <div class="bonus-content">
+        <div class="bonus-name">The AI Content Vault</div>
+        <div class="bonus-desc">400+ ready-to-post LinkedIn winners. Plus 10 AI tools that write, design and post for you.</div>
+      </div>
+      <div class="bonus-price">$3,997</div>
+    </div>
+
+    <div class="bonus">
+      <div class="bonus-content">
+        <div class="bonus-name">Lifetime Access To All AI Tools &amp; Code</div>
+        <div class="bonus-desc">Every AI agent. Every tool. Every template Danny ever builds. Yours forever. Auto-updated.</div>
+      </div>
+      <div class="bonus-price">$2,497</div>
+    </div>
+
+    <div class="bonus">
+      <div class="bonus-content">
+        <div class="bonus-name">AI Danny. Your 24/7 Coach Clone.</div>
+        <div class="bonus-desc">An AI trained on Danny's brain. Ask it anything. Day. Night. Sunday at 11pm.</div>
+      </div>
+      <div class="bonus-price">$1,997</div>
+    </div>
+
+  </div>
+
+  <div class="fast-action-title">
+    <div class="label">First 25 Only</div>
+    <div class="text">Fast Action Bonus</div>
+  </div>
+
+  <div class="bonuses">
+
+    <div class="bonus gold">
+      <div class="bonus-content">
+        <div class="bonus-name">VIP 1-on-1 With Danny</div>
+        <div class="bonus-desc">60 minutes. Just you and Danny. Your business. Your numbers. Your plan. Personal. Private.</div>
+      </div>
+      <div class="bonus-price">$1,997</div>
+    </div>
+
+  </div>
+
+  <div class="promise">
+    <div class="ptitle">★ The Deployment Promise ★</div>
+    <div class="pbody">Show up to all 20 hours. You'll walk out with at least one AI agent running in your business. We work until it's deployed. Period.</div>
+  </div>
+
+  <div class="totals-block">
+    <div class="total-value">Total Value: $37,964</div>
+    <div class="roi-math"><span class="accent">$1,997 once</span> replaces a <span class="accent">$4,000/mo VA</span>. Pays for itself in 15 days.</div>
+    <div class="special-offer">Today Only: <span class="price">$1,997</span></div>
+    <div class="urgency">If you're in, stand up. Walk to the back. The 25 fastest get the VIP track.</div>
+    <div class="regret">Walk out without this. 12 months from now you're still doing the work while your competitor's AI does it for $4 a day.</div>
+  </div>
+
+  <div class="brand-footer">
+    <div class="brand">Purely Personal</div>
+    <div>10X With AI. Limited Time Offer.</div>
+  </div>
+
+</div>
+
+</body>
+</html>

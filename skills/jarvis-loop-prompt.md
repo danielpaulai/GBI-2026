@@ -1,0 +1,59 @@
+---
+name: jarvis-loop-prompt
+description: Generate Seedance video prompts for GBI 2026 cinematic backdrop loops. Use when generating any 5-10s video clip that will serve as a state-triggered backdrop in the Jarvis-style command center. Outputs prompts ready to paste into fal.ai or Key.ai SeaDance interface, optimized for seamless looping and Hollywood-grade aesthetic.
+type: claude-code-skill
+---
+
+# Jarvis Loop Prompt Skill
+
+Use this skill when the user asks for a Seedance prompt for the GBI 2026 demo backdrops or wing animations.
+
+## Hard constraints (always)
+- Output: 5-10 second clip, 720p, 16:9, no audio
+- **First frame and last frame must match** (seamless loop — render the ending close to the start to hide the seam)
+- Color palette: cyan `#00d4ff` (primary "alive"), amber `#ffa500` (active processing), deep void `#050810` (background). Two neons MAX.
+- No text rendered IN the video (text is rendered in the HUD overlay layer — keeps backdrop reusable)
+- Camera: subtle dolly OR static — no aggressive moves
+- Pacing: slow, contemplative — Blade Runner 2049, not Transformers
+
+## Reference style anchors (cite these in every prompt)
+- Iron Man HUD (Perception Studio)
+- Blade Runner 2049 UI (Territory Studio)
+- TRON: Legacy holograms (GMUNK)
+- Apple Vision Pro keynote (translucency, depth via shadow not 3D)
+
+## The 5-step prompt template
+1. **Scene** in 2 sentences (what's there + what's happening)
+2. **Camera move** ("camera static" / "subtle dolly forward" / "slow orbit")
+3. **Color & lighting** (always reference the palette above explicitly)
+4. **Loop mechanic** ("the final frame matches the first")
+5. **Negative space** — what NOT to include (text, fast motion, multiple subjects, lens flare, sci-fi cliches)
+
+## Required clip set for GBI 2026 (6 clips)
+
+| Clip | When it plays | Scene direction |
+|---|---|---|
+| `idle.mp4` | Default state, behind everything | Slow cyan particle drift in deep void, holographic grid floor at distance, gentle camera dolly |
+| `boot.mp4` | Volunteer wakes the system (Beat 1) | Particles converge into central glowing cyan orb, hexagonal grid emerges around it |
+| `wing-wake.mp4` | A wing opens (CMO/CRO/COO/CFO) | Three angular octagonal panels materialize from particles, data lines connect to center orb |
+| `meeting.mp4` | Inter-wing collaboration (Act 3) | Light streams flow between three glowing nodes, particles trail along the paths |
+| `synthesis.mp4` | Final output materializes | Bright text-shaped silhouette coalesces from particles, holographic projection effect |
+| `war-room.mp4` | Act 3 backdrop | Three-column data flow, parallel light streams, NASA Mission Control energy |
+
+## Output format
+Return ONLY the prompt as a code block, ready to paste. Confirm the character count is under 1000. Confirm it includes the loop mechanic and negative space sections.
+
+## Example output
+```
+Scene: A glowing cyan orb sits at the center of a deep black void. Soft particles of cyan light drift gently around the orb, forming a slowly-rotating constellation pattern. A faint holographic grid floor extends to infinity below.
+
+Camera: static, with imperceptible breathing motion (1-2% scale oscillation over 10 seconds).
+
+Color & lighting: deep void background (#050810). Single primary light source is the cyan orb (#00d4ff) emitting soft volumetric glow. Subtle amber accent (#ffa500) on grid intersections at distance. No other colors.
+
+Loop mechanic: the final frame matches the first. Particles return to identical positions. Orb pulse phase resets.
+
+Negative space: no text, no logos, no humans, no fast motion, no lens flare, no obvious sci-fi cliches like rotating wireframes or tachyon trails. Restraint over decoration.
+
+Aesthetic anchor: Blade Runner 2049 UI (Territory Studio) — vast negative space, single hero element, premium restraint.
+```

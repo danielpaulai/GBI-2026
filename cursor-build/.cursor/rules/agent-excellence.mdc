@@ -1,0 +1,166 @@
+---
+description: GBI 2026 agent excellence patterns — voice-locked output, expert framework prompts, Promptfoo eval gate, behavioral personality encoding, CEO-as-conflict-resolver synthesis, model routing across Haiku/Sonnet/Opus 4.7. Invoke when implementing any wing's system prompt, building eval suites, or wiring the CEO synthesis.
+alwaysApply: false
+---
+
+# Agent Excellence Skill
+
+Use this skill when building any wing's system prompt, the CEO synthesis logic, or the Promptfoo eval suite.
+
+## The non-negotiables (per research doc 12)
+
+### 1. KILL persona stacking
+Do NOT write `"You are Ann Handley + Russell Brunson + Joanna Wiebe combined"`. The PRISM paper proves this **damages** accuracy. Replace with **Expert Framework Prompts** — describe the methodology, not the person.
+
+❌ `"You are an expert CMO with 20 years of experience..."`
+✅ `"Apply Ann Handley's pre-publish checklist: kill every adverb, every 'really,' every 'just,' every passive sentence. Replace abstract nouns with concrete ones. Lead with the line that would make you forward the post."`
+
+39% quality lift from XML-structured framework prompts.
+
+### 2. Few-shot is mandatory
+Every wing's cached system prompt MUST include 3-5 hand-curated "world-class output" reference examples. Single biggest free quality lift. Don't skip.
+
+### 3. Voice-locked agent stack (3 layers)
+1. **Voice corpus** — 20-30 of Danny's actual posts/scripts/transcripts in cached system prompt (use `voice-extractor` skill output)
+2. **Banned-phrase + required-pattern lint** — run `de-ai-ify` and `tweet-draft-reviewer` skills as POST-GENERATION GATE, not optional
+3. **Style-rubric LLM judge** — second Claude call scores draft against 8 voice rules. If score <7, regenerate with failure as feedback
+
+### 4. Promptfoo eval gate ≥8.5
+Build 20 hand-graded "world-class" reference outputs per wing (80 total fixtures). LLM-as-judge scores each agent run vs. references. **No sub-tool ships to stage without ≥8.5/10.**
+
+```yaml
+# promptfooconfig.yaml example for CMO LinkedIn
+prompts:
+  - file://prompts/cmo-linkedin.txt
+providers:
+  - id: anthropic:claude-sonnet-4-5
+    config:
+      headers:
+        anthropic-beta: interleaved-thinking-2025-05-14
+tests:
+  - description: "world-class LinkedIn post about cohort launch"
+    vars:
+      topic: "AI Employee Cohort starting June 12"
+    assert:
+      - type: llm-rubric
+        value: |
+          Score 1-10 against these criteria:
+          - Hook question in first sentence (not statement)
+          - References current trend by name
+          - Ends with concrete CTA
+          - No corporate jargon, no "really", no "just", no passive voice
+          - Length 180-280 words
+          - Voice matches Danny's existing posts (see voice-corpus.md)
+        threshold: 8.5
+```
+
+## Personality as behavioral constraints (NOT adjectives)
+
+Encode each wing's personality as enforced output contracts:
+
+| Wing | Behavioral constraint (enforce in system prompt) |
+|---|---|
+| **CMO** | Open with hook question. Reference current trend by name. End with CTA. |
+| **CRO** | Lead with number. Second sentence is the ask. No hedging words. |
+| **COO** | Numbered steps only. Time estimate per step. One named owner per step. |
+| **CFO** | Lead with number. Line 2 = variance vs plan. Line 3 = one decision required. |
+
+## Model routing (the 90.2% lift configuration)
+
+```ts
+// Haiku 4.5 → router
+const router = anthropic.messages.create({
+  model: "claude-haiku-4-5-20251001",
+  max_tokens: 256,
+  // route incoming intent to a wing
+});
+
+// Sonnet 4.5 → 4 wings (with interleaved thinking)
+const wing = anthropic.messages.create({
+  model: "claude-sonnet-4-5-20250929",
+  max_tokens: 1024,
+  extra_headers: { "anthropic-beta": "interleaved-thinking-2025-05-14" },
+  system: [{
+    type: "text",
+    text: WING_SYSTEM_PROMPT, // framework + few-shots + voice corpus
+    cache_control: { type: "ephemeral" }
+  }],
+  // ...
+});
+
+// Opus 4.7 → CEO synthesis ONLY (with task budgets)
+const ceoSynthesis = anthropic.messages.create({
+  model: "claude-opus-4-7", // released April 16, 2026
+  max_tokens: 2048,
+  extra_headers: {
+    "anthropic-beta": "extended-thinking-2025-05-14,task-budget-2025-04-16"
+  },
+  thinking: { type: "enabled", budget_tokens: 4000 },
+  // CEO finds conflicts between wings + surfaces non-obvious play
+});
+```
+
+Opus-as-lead + Sonnet-as-subagents beats single-Opus by 90.2% on Anthropic's internal eval.
+
+## CEO synthesis = conflict-resolver, NOT summarizer
+
+This is Act 3. **DO NOT write a system prompt that says "summarize the wings."** That's the failure mode.
+
+Use this pattern:
+
+```
+You are the CEO synthesizer. You receive 4 wing outputs (CMO, CRO, COO, CFO).
+
+Your job has TWO passes:
+
+PASS 1 — Find the conflict.
+Identify the 1-2 places where:
+- Wings disagree on priority or approach
+- One wing's plan blocks another's (e.g., COO's hire timeline conflicts with CFO's runway)
+- A non-obvious dependency exists (e.g., CMO's launch needs CRO's pipeline by Wed)
+
+PASS 2 — Resolve + surface the play.
+Produce a weekly plan that:
+- Explicitly resolves the conflict identified in Pass 1
+- Surfaces ONE non-obvious cross-wing insight
+- Names the single most important focus for the week
+
+Output format:
+1. THE CONFLICT (1 sentence)
+2. THE RESOLUTION (1-2 sentences, with rationale)
+3. THE NON-OBVIOUS PLAY (1 sentence — what most CEOs would miss)
+4. THIS WEEK'S 3 PRIORITIES (numbered, each with rationale)
+```
+
+This earns the close. Generic synthesis kills the demo.
+
+## Speed optimizations
+
+- **Prompt caching** — every wing's system prompt + voice corpus + few-shots cached. Note: TTL dropped from 60min to 5min in early 2026; keep stage requests <5min apart.
+- **Parallel tool calls** — Sonnet 4.5 fires 3-5 tools simultaneously per turn. Use it.
+- **Pre-warming** — fire dummy call on each wing 30s before its act. Cache hot.
+- **Streaming with visible thinking UI** — even 25s feels like 8s when audience watches the work happen.
+
+## Tool curation per wing (4 tools max each)
+
+| Wing | The 4 tools |
+|---|---|
+| **CMO** | Apify rag-web-browser, Google Trends scraper, Tweet scraper, LinkedIn profile search |
+| **CRO** | LinkedIn profile scraper, Gmail MCP (draft only), Apollo via Apify, cold-outreach-sequence skill |
+| **COO** | Calendar MCP, Notion MCP, Granola MCP (transcripts), Slack MCP |
+| **CFO** | Stripe MCP, Apify (competitor pricing), Supabase MCP, calculation tools |
+
+The stage problem isn't access — it's curation. Pre-bind 4 tools per wing, tested in dry run.
+
+## Acceptance criteria (Day 3-4 deliverable per wing)
+- [ ] System prompt uses Expert Framework, NOT persona stacking
+- [ ] 3-5 reference few-shots in cached prefix
+- [ ] Voice corpus (20-30 Danny posts) cached
+- [ ] Behavioral constraint contract enforced
+- [ ] Promptfoo eval suite with 20 fixtures, all scoring ≥8.5
+- [ ] de-ai-ify gate runs post-generation
+- [ ] Style rubric judge regenerates if <7
+- [ ] Pre-bound to exactly 4 tools
+- [ ] Streams visible "thinking" UI during generation
+
+If all 8 pass, the wing is stage-ready. If any fail, the wing is benched.

@@ -1,0 +1,1205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>The Jarvis Build Guide — 10X With AI Command Center</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  @page { size: A4; margin: 0; }
+  html, body {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+    color-adjust: exact;
+  }
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    color: #fff;
+    background: #1a1a1a;
+    line-height: 1.55;
+    font-size: 10pt;
+  }
+  .page {
+    width: 210mm;
+    min-height: 297mm;
+    margin: 0 auto;
+    background: radial-gradient(ellipse at top right, #4a0d10 0%, #1a0204 45%, #0a0000 100%);
+    position: relative;
+    overflow: hidden;
+    padding: 16mm 16mm 12mm;
+    page-break-after: always;
+  }
+  .page:last-child { page-break-after: auto; }
+
+  h1 {
+    font-weight: 900;
+    font-size: 32pt;
+    line-height: 1;
+    letter-spacing: -0.03em;
+    color: #ec4357;
+    text-transform: uppercase;
+    margin-bottom: 3mm;
+    text-shadow: 0 0 20px rgba(236,67,87,0.3);
+  }
+  h2 {
+    font-weight: 800;
+    font-size: 14pt;
+    line-height: 1.15;
+    color: #fff;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+    margin-top: 6mm;
+    margin-bottom: 2.5mm;
+    padding-bottom: 1mm;
+    border-bottom: 1.5pt solid #ec4357;
+  }
+  h2.gold { border-bottom-color: #fbbf24; color: #fbbf24; }
+  h3 {
+    font-weight: 700;
+    font-size: 11pt;
+    color: #ec4357;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    margin-top: 4mm;
+    margin-bottom: 1.5mm;
+  }
+  h3.gold { color: #fbbf24; }
+  h4 {
+    font-weight: 700;
+    font-size: 10pt;
+    color: #fbbf24;
+    margin-top: 3mm;
+    margin-bottom: 1mm;
+  }
+  .doc-tag {
+    display: inline-block;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 8pt;
+    font-weight: 600;
+    letter-spacing: 0.18em;
+    color: #fbbf24;
+    background: rgba(251,191,36,0.1);
+    border: 1pt solid rgba(251,191,36,0.4);
+    border-radius: 1.5mm;
+    padding: 1mm 3mm;
+    margin-bottom: 4mm;
+    text-transform: uppercase;
+  }
+  .subtitle {
+    font-size: 11pt;
+    font-weight: 500;
+    color: #d8d8d8;
+    margin-bottom: 5mm;
+    line-height: 1.4;
+    font-style: italic;
+  }
+  p { margin-bottom: 2.5mm; color: #e5e5e5; font-size: 10pt; }
+  p strong { color: #fff; font-weight: 700; }
+  p em { color: #fbbf24; font-style: italic; }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 2mm 0 4mm;
+    font-size: 9pt;
+  }
+  table th {
+    background: rgba(236,67,87,0.15);
+    color: #ec4357;
+    text-align: left;
+    padding: 1.8mm 2.5mm;
+    font-weight: 800;
+    font-size: 8pt;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    border-bottom: 1.2pt solid #ec4357;
+    vertical-align: top;
+  }
+  table td {
+    padding: 1.6mm 2.5mm;
+    border-bottom: 1pt solid rgba(255,255,255,0.08);
+    color: #d8d8d8;
+    vertical-align: top;
+    font-size: 9pt;
+  }
+  table td.label { font-weight: 700; color: #fff; }
+  table td.num { text-align: right; font-variant-numeric: tabular-nums; color: #fbbf24; font-weight: 700; }
+  .callout {
+    background: rgba(15,5,5,0.7);
+    border-left: 3pt solid #ec4357;
+    border-radius: 0 2mm 2mm 0;
+    padding: 2.5mm 3.5mm;
+    margin: 2.5mm 0 3.5mm;
+  }
+  .callout.gold {
+    border-left-color: #fbbf24;
+    background: linear-gradient(90deg, rgba(251,191,36,0.08), transparent);
+  }
+  .callout-title {
+    font-weight: 800;
+    font-size: 9pt;
+    letter-spacing: 0.08em;
+    color: #ec4357;
+    text-transform: uppercase;
+    margin-bottom: 1mm;
+  }
+  .callout.gold .callout-title { color: #fbbf24; }
+  .callout p { font-size: 9pt; margin-bottom: 1.2mm; line-height: 1.45; }
+  .callout p:last-child { margin-bottom: 0; }
+  blockquote {
+    background: rgba(236,67,87,0.08);
+    border-left: 3pt solid #ec4357;
+    padding: 2.5mm 3.5mm;
+    margin: 2.5mm 0;
+    font-size: 10pt;
+    color: #fff;
+    border-radius: 0 2mm 2mm 0;
+  }
+  ul, ol { margin: 1.5mm 0 3mm 6mm; }
+  li { margin-bottom: 0.8mm; color: #e5e5e5; line-height: 1.45; font-size: 9.5pt; }
+  li strong { color: #fff; }
+  code {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 8.5pt;
+    background: rgba(236,67,87,0.15);
+    color: #fbbf24;
+    padding: 0.3mm 1mm;
+    border-radius: 0.8mm;
+  }
+  pre {
+    background: rgba(0,0,0,0.6);
+    border: 1pt solid rgba(236,67,87,0.4);
+    border-radius: 2mm;
+    padding: 3mm 4mm;
+    margin: 2.5mm 0 3.5mm;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 8.5pt;
+    line-height: 1.5;
+    color: #fbbf24;
+    overflow-x: auto;
+    white-space: pre;
+  }
+  pre code { background: none; padding: 0; color: inherit; }
+  .hero-banner {
+    background: #0a0204;
+    border: 2pt solid #ec4357;
+    border-radius: 3mm;
+    padding: 7mm;
+    margin-bottom: 6mm;
+    text-align: center;
+    box-shadow: 0 0 40px rgba(236,67,87,0.2);
+  }
+  .hero-banner .name {
+    font-weight: 900;
+    font-size: 38pt;
+    letter-spacing: -0.03em;
+    color: #ec4357;
+    line-height: 1;
+    text-shadow: 0 0 30px rgba(236,67,87,0.4);
+  }
+  .hero-banner .tag {
+    font-weight: 600;
+    font-size: 10pt;
+    color: #d8d8d8;
+    margin-top: 2mm;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+  .stat-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 2.5mm;
+    margin: 3mm 0;
+  }
+  .stat-card {
+    background: rgba(15,5,5,0.7);
+    border: 1pt solid #ec4357;
+    border-radius: 2mm;
+    padding: 3mm;
+    text-align: center;
+  }
+  .stat-card .num {
+    font-weight: 900;
+    font-size: 16pt;
+    color: #ec4357;
+    line-height: 1;
+    margin-bottom: 1mm;
+  }
+  .stat-card .label {
+    font-size: 7.5pt;
+    color: #d8d8d8;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    font-weight: 600;
+  }
+  .three-layer {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 3mm;
+    margin: 3mm 0 4mm;
+  }
+  .layer-card {
+    background: rgba(15,5,5,0.7);
+    border: 1.5pt solid #ec4357;
+    border-radius: 2mm;
+    padding: 4mm;
+  }
+  .layer-card h4 {
+    color: #ec4357;
+    font-size: 11pt;
+    margin: 0 0 2mm 0;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+  .layer-card .desc {
+    font-size: 8.5pt;
+    color: #d8d8d8;
+    line-height: 1.4;
+  }
+  .layer-card .stack {
+    margin-top: 2mm;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 7.5pt;
+    color: #fbbf24;
+  }
+  .architecture-block {
+    background: rgba(0,0,0,0.5);
+    border: 1pt solid rgba(236,67,87,0.4);
+    border-radius: 2mm;
+    padding: 4mm;
+    margin: 3mm 0 4mm;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 7pt;
+    line-height: 1.4;
+    color: #fbbf24;
+    white-space: pre;
+    overflow-x: auto;
+  }
+  .repo-card {
+    background: rgba(15,5,5,0.6);
+    border: 1pt solid rgba(236,67,87,0.5);
+    border-left: 3pt solid #ec4357;
+    border-radius: 0 2mm 2mm 0;
+    padding: 3mm 4mm;
+    margin-bottom: 3mm;
+  }
+  .repo-card .repo-name {
+    font-weight: 800;
+    font-size: 10.5pt;
+    color: #ec4357;
+    margin-bottom: 0.5mm;
+  }
+  .repo-card .repo-meta {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 7.5pt;
+    color: #fbbf24;
+    margin-bottom: 1.5mm;
+    letter-spacing: 0.02em;
+  }
+  .repo-card .repo-desc {
+    font-size: 8.8pt;
+    color: #d8d8d8;
+    line-height: 1.4;
+  }
+  .repo-card .repo-desc strong { color: #fff; }
+  .day-card {
+    background: linear-gradient(90deg, rgba(236,67,87,0.08), transparent);
+    border-left: 3pt solid #ec4357;
+    padding: 3mm 4mm;
+    margin-bottom: 2.5mm;
+    border-radius: 0 2mm 2mm 0;
+  }
+  .day-card .day-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 700;
+    font-size: 8pt;
+    color: #fbbf24;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+  }
+  .day-card .day-title {
+    font-weight: 800;
+    font-size: 11pt;
+    color: #fff;
+    margin: 0.5mm 0 1.5mm;
+  }
+  .day-card .day-deliverable {
+    margin-top: 2mm;
+    font-size: 8.5pt;
+    color: #fbbf24;
+    font-style: italic;
+  }
+  .day-card ul { margin-top: 1mm; margin-bottom: 1mm; }
+  .page-footer {
+    position: absolute;
+    bottom: 8mm;
+    left: 16mm;
+    right: 16mm;
+    display: flex;
+    justify-content: space-between;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 7pt;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.4);
+    padding-top: 2mm;
+    border-top: 1pt solid rgba(255,255,255,0.1);
+  }
+  .page-footer .brand { color: #ec4357; font-weight: 700; }
+  .divider {
+    height: 1pt;
+    background: linear-gradient(90deg, #ec4357, transparent);
+    margin: 4mm 0;
+  }
+  .rule-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2.5mm;
+    margin: 2mm 0 4mm;
+  }
+  .rule-card {
+    background: rgba(15,5,5,0.6);
+    border: 1pt solid rgba(251,191,36,0.4);
+    border-radius: 2mm;
+    padding: 2.5mm 3mm;
+  }
+  .rule-card .rule-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 700;
+    font-size: 7.5pt;
+    color: #fbbf24;
+    letter-spacing: 0.1em;
+    margin-bottom: 0.5mm;
+  }
+  .rule-card .rule-title {
+    font-weight: 700;
+    font-size: 9.5pt;
+    color: #fff;
+    margin-bottom: 1mm;
+  }
+  .rule-card .rule-body {
+    font-size: 8pt;
+    color: #d8d8d8;
+    line-height: 1.4;
+  }
+  @media print { body { background: #000; } .page { box-shadow: none; } }
+  @media screen {
+    body { padding: 24px 16px; background: #2a2a2a; }
+    .page { box-shadow: 0 12px 50px rgba(0,0,0,0.6); margin-bottom: 24px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ====== PAGE 1: COVER & THE 3 LAYERS ====== -->
+<div class="page">
+  <span class="doc-tag">The Jarvis Build Guide · For Build</span>
+
+  <div class="hero-banner">
+    <div class="name">10X COMMAND CENTER</div>
+    <div class="tag">Multi-Agent Orchestrator · Jarvis-Grade UI · Build in 7 Days</div>
+  </div>
+
+  <h1>Three Layers</h1>
+  <div class="subtitle">A live, voice-controlled, multi-agent AI Employee Command Center demoed on stage at GBI Singapore 2026. Real Claude calls. Real-time streaming. Inter-agent traffic visible to the audience.</div>
+
+  <div class="three-layer">
+    <div class="layer-card">
+      <h4>1. Visual Shell</h4>
+      <div class="desc">CEO node at the center, 3 department satellites orbiting (Marketing, Sales, Operations). Pulsing nodes, expanding rings, light traveling between agents, particle backdrop, glassmorphism.</div>
+      <div class="stack">React · Framer Motion · React Three Fiber · Tailwind · Arwes</div>
+    </div>
+    <div class="layer-card">
+      <h4>2. Agent Orchestration</h4>
+      <div class="desc">A "CEO" agent routes commands to Marketing/Sales/Ops sub-agents. Each sub-agent has its own brief/voice/tools. They collaborate visibly. WebSocket streams updates as agents think.</div>
+      <div class="stack">Anthropic SDK · LangGraph supervisor · Sonnet 4.5 · CopilotKit AG-UI</div>
+    </div>
+    <div class="layer-card">
+      <h4>3. Cinematic Layer</h4>
+      <div class="desc">Pre-rendered cinematic moments — boot-up intro, transition videos, ambient backdrops. Higgsfield + Seedance shine here. Not for live agent work — for the theater around it.</div>
+      <div class="stack">Higgsfield · Seedance · HTMLVideoElement · mix-blend-mode</div>
+    </div>
+  </div>
+
+  <h2>The TL;DR Stack</h2>
+  <table>
+    <tr><th style="width:25%">Layer</th><th>Pick</th></tr>
+    <tr><td class="label">Frontend</td><td>Next.js 15 + CopilotKit + AG-UI Protocol</td></tr>
+    <tr><td class="label">Component primitives</td><td>shadcn/ui + Tailwind + Arwes (sci-fi chrome)</td></tr>
+    <tr><td class="label">Motion</td><td>Motion (Framer) + GSAP timeline (boot sequence)</td></tr>
+    <tr><td class="label">3D scene</td><td>react-three-fiber + drei + @react-three/postprocessing</td></tr>
+    <tr><td class="label">Inter-agent lines</td><td>xyflow (React Flow) OR Magic UI AnimatedBeam</td></tr>
+    <tr><td class="label">Particle backdrop</td><td>tsParticles `links` preset</td></tr>
+    <tr><td class="label">Streaming text</td><td>Vercel AI SDK + flowtoken (per-token blur-in)</td></tr>
+    <tr><td class="label">Audio</td><td>Howler.js sprite + Arwes BleepsProvider</td></tr>
+    <tr><td class="label">Orchestration</td><td>LangGraph (Python) + langgraph-supervisor</td></tr>
+    <tr><td class="label">Agent runtime</td><td>Claude Sonnet 4.5 via Anthropic SDK</td></tr>
+    <tr><td class="label">Voice</td><td>OpenAI Realtime API (transcribe only) → Claude</td></tr>
+    <tr><td class="label">Backdrop video</td><td>Higgsfield + Seedance · loop · screen blend</td></tr>
+  </table>
+
+  <div class="callout gold">
+    <div class="callout-title">★ Build Window</div>
+    <p><strong>7 days</strong>, solo builder + Claude Code. ~6-8 hrs/day focused build. Days 1-5 lock in features, Days 6-7 polish + rehearsal. Don't ship anything new on Day 7.</p>
+  </div>
+
+  <div class="page-footer">
+    <span><span class="brand">Jarvis Build Guide</span> · 10X Command Center</span>
+    <span>Page 1 · Cover</span>
+  </div>
+</div>
+
+<!-- ====== PAGE 2: BACKEND STACK — TOP 5 REPOS ====== -->
+<div class="page">
+  <span class="doc-tag">Backend Stack · Top 5 Repos to Clone</span>
+
+  <h1>Agent Orchestration Layer</h1>
+  <div class="subtitle">These five repos give you the entire backend. Clone in this stack-rank order. Modify, don't build from scratch.</div>
+
+  <div class="repo-card">
+    <div class="repo-name">A1. CopilotKit/CopilotKit</div>
+    <div class="repo-meta">★ 30.5k · MIT · github.com/CopilotKit/CopilotKit</div>
+    <div class="repo-desc"><strong>Frontend protocol layer.</strong> Ships the AG-UI Protocol — streaming agent state, tool calls, intermediate steps from any backend (LangGraph, ADK, custom) into a React frontend. Adopted by Google, Oracle, LangChain. Provides <code>useCoAgent</code>, <code>useCoAgentStateRender</code>, human-in-the-loop, generative UI. <strong>Study first:</strong> <code>examples/coagents-research-canvas/</code> — full-stack LangGraph + CopilotKit canvas, mirror of demo shape. <strong>Integration: ~4 hours baseline, ~1 day for routing visuals.</strong></div>
+  </div>
+
+  <div class="repo-card">
+    <div class="repo-name">A2. langchain-ai/langgraph + langgraph-supervisor-py</div>
+    <div class="repo-meta">★ 30.9k · MIT · github.com/langchain-ai/langgraph</div>
+    <div class="repo-desc"><strong>Orchestration backbone.</strong> The supervisor pattern maps 1:1 to "CEO agent → department agents". Built-in checkpointing, streaming events (<code>stream_mode="values" / "updates" / "messages"</code>), human-in-the-loop, time-travel debug. LangGraph Studio gives a free graph visualizer you can secondary-screen on stage. <strong>Study first:</strong> <code>langgraph-supervisor-py/README.md</code> — supervisor primitive in 30 lines. <strong>Integration: ~6-10 hours.</strong></div>
+  </div>
+
+  <div class="repo-card">
+    <div class="repo-name">A3. anthropics/claude-agent-sdk-demos</div>
+    <div class="repo-meta">★ 2.3k · MIT · TS 88% Python 9%</div>
+    <div class="repo-desc"><strong>Anthropic's reference patterns.</strong> The <code>research-agent/</code> demo is a CEO-orchestrator-routes-to-subagents demo with parallel research workers. Uses <code>AgentDefinition</code>, <code>SubagentTracker</code>, <code>HookMatcher</code> — exact primitives needed to track and stream subagent activity. <code>simple-chat-app/</code> shows React + Express + WebSocket streaming. <strong>Integration: ~2 hours to clone, ~1 day to fork the orchestrator pattern.</strong></div>
+  </div>
+
+  <div class="repo-card">
+    <div class="repo-name">A4. assistant-ui/assistant-ui</div>
+    <div class="repo-meta">★ 9.8k · MIT · 200k monthly downloads</div>
+    <div class="repo-desc"><strong>Streaming chat primitives.</strong> Streaming, auto-scroll, tool-call rendering, voice dictation, accessibility, retries — chat-UX details that eat 2 days when you build them yourself. Integrates natively with Vercel AI SDK, LangGraph, AND Mastra. Used by LangChain, Stack AI, Browser Use. Composable shadcn-style primitives. <strong>Use it for the chat column; CopilotKit for the agent state column. Don't run both chat shells.</strong></div>
+  </div>
+
+  <div class="repo-card">
+    <div class="repo-name">A5. openai/openai-realtime-agents</div>
+    <div class="repo-meta">★ 6.8k · MIT · Next.js + WebRTC</div>
+    <div class="repo-desc"><strong>Voice front-end reference.</strong> The cleanest open-source pattern for browser-native voice agents with WebRTC. Includes the Chat-Supervisor pattern (small realtime model for fast voice + bigger model for reasoning) and Sequential Handoffs. <strong>Use front-end voice but route the transcribed intent to your Claude orchestrator</strong> — don't lock the show to OpenAI's runtime. <strong>Critical:</strong> use push-to-talk on stage. Open-mic VAD + audience laughter = chaos. Volunteer holds spacebar.</div>
+  </div>
+
+  <div class="callout gold">
+    <div class="callout-title">★ Why Not the Alternatives</div>
+    <p><strong>Not OpenAI Agents SDK as orchestrator</strong> — breaks the "Claude-powered" narrative. Use only for voice front-end.</p>
+    <p><strong>Not CrewAI</strong> — inter-agent state is fuzzy and hard to visualize live. Audience needs to see deterministic routing.</p>
+    <p><strong>Not AutoGen</strong> — debate-style agent loops blow latency. 4-agent debate × 5 rounds = 20+ LLM calls = 30s silence on stage.</p>
+    <p><strong>Not Mastra</strong> — beautiful TS framework, but LangGraph + CopilotKit ecosystem has tooling Claude Code can scaffold fastest today.</p>
+  </div>
+
+  <div class="page-footer">
+    <span><span class="brand">Jarvis Build Guide</span></span>
+    <span>Page 2 · Backend Stack</span>
+  </div>
+</div>
+
+<!-- ====== PAGE 3: VISUAL STACK — TOP 5 REPOS ====== -->
+<div class="page">
+  <span class="doc-tag">Visual Stack · Top 5 Repos to Clone</span>
+
+  <h1>Jarvis-Grade UI Layer</h1>
+  <div class="subtitle">These five together give you the entire shell. Iron Man / Tron / Mission: Impossible energy. Every other repo on the next page is additive polish.</div>
+
+  <div class="repo-card">
+    <div class="repo-name">V1. arwes/arwes (@arwes/react)</div>
+    <div class="repo-meta">★ 7.5k · MIT · github.com/arwes/arwes</div>
+    <div class="repo-desc"><strong>This IS the Jarvis aesthetic.</strong> <code>Animator</code> system orchestrates entrance/exit states across nested components ("idle → entering → entered → exiting"). <code>&lt;FrameSVGOctagon&gt;</code>, <code>&lt;FrameSVGCorners&gt;</code> — angled chamfered-corner panels you see in every sci-fi UI. <code>&lt;BleepsProvider&gt;</code> for built-in UI sounds. Influences explicitly cited: Star Citizen, Halo, TRON: Legacy. <strong>Steeper API than shadcn — budget 1 day to grok the Animator state machine.</strong></div>
+  </div>
+
+  <div class="repo-card">
+    <div class="repo-name">V2. xyflow/xyflow (React Flow)</div>
+    <div class="repo-meta">★ 36.4k · MIT · github.com/xyflow/xyflow</div>
+    <div class="repo-desc"><strong>Bones of the agent network.</strong> Nodes for CEO + departments, edges between them, animated edge support out of the box. Built-in <code>&lt;AnimatedSVGEdge&gt;</code> example animates a circle along the SVG path — that's literally "data flowing between agents". <strong>Fork:</strong> <code>examples/edges/animated-svg-edge</code> — file <code>AnimatedSVGEdge.tsx</code> is the data-flow line. <strong>Integration: ~3 hours for radial layout.</strong></div>
+  </div>
+
+  <div class="repo-card">
+    <div class="repo-name">V3. Aceternity UI + Magic UI (copy-paste components)</div>
+    <div class="repo-meta">★ 10k+ / 14k+ · MIT · ui.aceternity.com + magicui.design</div>
+    <div class="repo-desc"><strong>The polish layer.</strong> Specifically copy: <strong>Glowing Effect</strong> (Aceternity, radial pointer-follow glow on department hover) · <strong>Background Beams with Collision</strong> (Aceternity, cinematic backdrop) · <strong>Spotlight</strong> (Aceternity, single beam highlighting CEO node on entry) · <strong>Animated Beam</strong> (Magic UI, fastest way to do inter-agent connections — pass refs, set <code>gradientStartColor</code> + <code>pathColor</code>, ~30 lines total) · <strong>Terminal</strong> (Magic UI, streaming text component) · <strong>Marquee</strong> (Magic UI, status ticker). <strong>Each is single-file paste — trivial integration.</strong></div>
+  </div>
+
+  <div class="repo-card">
+    <div class="repo-name">V4. react-three-fiber + drei + react-postprocessing</div>
+    <div class="repo-meta">★ R3F 28k, drei 9k, post 1.8k · MIT · pmndrs/*</div>
+    <div class="repo-desc"><strong>The 3D CEO sphere with real volumetric glow.</strong> Drei: <code>&lt;Sphere&gt;</code>, <code>&lt;MeshDistortMaterial&gt;</code> (CEO core surface that subtly pulses), <code>&lt;Sparkles&gt;</code>, <code>&lt;Float&gt;</code>. Postprocessing's <code>&lt;Bloom&gt;</code> with <code>luminanceThreshold={1}</code> and emissive materials at <code>color intensity &gt; 1</code> = real selective glow, not a CSS box-shadow fake. <strong>Study:</strong> <code>r3f-by-example/examples/effects/emissive-bloom/</code> — that's 90% of your CEO-node shader work. <strong>Integration: 1 full day for central scene.</strong></div>
+  </div>
+
+  <div class="repo-card">
+    <div class="repo-name">V5. Vercel AI SDK + flowtoken</div>
+    <div class="repo-meta">★ 12k+ / 528 · MIT · vercel/ai + Ephibbs/flowtoken</div>
+    <div class="repo-desc"><strong>Cinematic LLM streaming.</strong> Vercel AI SDK's <code>streamText</code> + <code>useChat</code> handles the data plumbing; flowtoken wraps each token in a <code>blurIn</code> or <code>fadeAndScale</code> animation so it doesn't look like cheap JS typewriter — it looks like the AI is <em>materializing</em> thoughts. <strong>Fork:</strong> <code>flowtoken/src/components/SmoothText.tsx</code> — pass <code>animation="blurIn"</code>, <code>animationDuration="800ms"</code>. <strong>Integration: ~2 hours.</strong></div>
+  </div>
+
+  <h3 class="gold">Plus 11 Supporting Repos</h3>
+  <table>
+    <tr><th style="width:35%">Repo</th><th>Use</th></tr>
+    <tr><td class="label">ScifiCN UI (baxy5/scificn-ui)</td><td>shadcn-compatible sci-fi components in 3 themes (Sci-Fi green/amber, Star Wars, Alien)</td></tr>
+    <tr><td class="label">The Gridcn</td><td>Tron-styled shadcn theme, 50+ components, neon borders, scanlines</td></tr>
+    <tr><td class="label">GlitchCN UI</td><td>CRT/scanline overlay — single-file paste</td></tr>
+    <tr><td class="label">tsParticles `links` preset</td><td>Connecting-dots backdrop — ~80 particles, link distance 150, opacity 0.3</td></tr>
+    <tr><td class="label">Recon Dashboard</td><td>Working cinematic mission-control reference (cherry-pick CRT keyframes + globe)</td></tr>
+    <tr><td class="label">Howler.js</td><td>Audio sprite engine — sub-1KB triggers, zero-latency UI bleeps</td></tr>
+    <tr><td class="label">r3f-particle-system</td><td>GPU particles inside CEO node — swirling vortex of light</td></tr>
+    <tr><td class="label">agent-prism</td><td>AI-agent trace timeline — drop into expanded department panel</td></tr>
+    <tr><td class="label">Theatre.js</td><td>After-Effects-style timeline editor for orchestrating boot sequence</td></tr>
+    <tr><td class="label">CopilotKit/canvas-with-langgraph-python</td><td>Closest turnkey monorepo — clone Day 1 and modify rather than build from scratch</td></tr>
+    <tr><td class="label">CopilotKit/open-multi-agent-canvas</td><td>Multi-agent-in-one-chat reference (Travel + Research + MCP)</td></tr>
+  </table>
+
+  <div class="page-footer">
+    <span><span class="brand">Jarvis Build Guide</span></span>
+    <span>Page 3 · Visual Stack</span>
+  </div>
+</div>
+
+<!-- ====== PAGE 4: ARCHITECTURE ====== -->
+<div class="page">
+  <span class="doc-tag">Architecture · Data Flow</span>
+
+  <h1>The System</h1>
+  <div class="subtitle">Voice in. Claude reasoning. Live UI streaming. Below is exactly what data flows where.</div>
+
+  <div class="architecture-block">                       ┌─────────────────────────────────────────────────────┐
+                       │              STAGE BIG SCREEN (1080p)               │
+                       │                                                     │
+                       │   ┌────────────────────────────────────────────┐    │
+                       │   │           Next.js 15 App (Vercel)          │    │
+                       │   │                                            │    │
+                       │   │  ┌──────────┐    ┌──────────────────────┐  │    │
+                       │   │  │ React    │    │  CopilotKit Sidebar  │  │    │
+                       │   │  │ Flow     │    │  (assistant-ui chat) │  │    │
+                       │   │  │ org-     │    │  - streaming tokens  │  │    │
+                       │   │  │ chart    │    │  - tool calls render │  │    │
+                       │   │  │  CEO     │    │  - agent state cards │  │    │
+                       │   │  │  /│\\     │    │                      │  │    │
+                       │   │  │ M  S  O  │    │                      │  │    │
+                       │   │  └────┬─────┘    └──────────┬───────────┘  │    │
+                       │   │       │                     │              │    │
+                       │   │       └────────┬────────────┘              │    │
+                       │   │                ▼                           │    │
+                       │   │     ┌──────────────────────┐                │    │
+                       │   │     │  AG-UI Protocol      │                │    │
+                       │   │     │  (SSE event stream)  │                │    │
+                       │   │     └──────────┬───────────┘                │    │
+                       │   └────────────────┼────────────────────────────┘    │
+                       │                    │                                 │
+                       └────────────────────┼─────────────────────────────────┘
+                                            │
+                  WebRTC voice               │ AG-UI events  (SSE)
+                  (push-to-talk volunteer)   │
+                       ▼                    ▼
+            ┌─────────────────────┐   ┌──────────────────────────────────────┐
+            │ OpenAI Realtime API │   │  FastAPI / Express bridge            │
+            │ (transcribe only)   │──▶│  (Python or Node, your call)         │
+            │ → text intent       │   └─────────────┬────────────────────────┘
+            └─────────────────────┘                 │
+                                                    ▼
+                                  ┌──────────────────────────────────────────┐
+                                  │  LangGraph Supervisor (Python)           │
+                                  │                                          │
+                                  │      ┌─────────────────────────┐         │
+                                  │      │   CEO Agent (Sonnet 4.5)│         │
+                                  │      │   system: "You are CEO" │         │
+                                  │      │   tools: [route_to_*]   │         │
+                                  │      └────────┬────────────────┘         │
+                                  │               │                          │
+                                  │      ┌────────┴───────┬──────────┐       │
+                                  │      ▼                ▼          ▼       │
+                                  │  ┌────────┐      ┌────────┐  ┌────────┐  │
+                                  │  │ Mktg   │      │ Sales  │  │ Ops    │  │
+                                  │  │ Agent  │      │ Agent  │  │ Agent  │  │
+                                  │  │ Sonnet │      │ Sonnet │  │ Sonnet │  │
+                                  │  │ 4.5    │      │ 4.5    │  │ 4.5    │  │
+                                  │  └────────┘      └────────┘  └────────┘  │
+                                  │                                          │
+                                  │  Anthropic SDK · prompt caching · MCP    │
+                                  │  Checkpointer: SQLite (in-memory OK)     │
+                                  └──────────────┬───────────────────────────┘
+                                                 │
+                                                 ▼
+                              ┌──────────────────────────────────────────┐
+                              │  Observability (3rd monitor)             │
+                              │  - LangGraph Studio (graph view)         │
+                              │  - Langfuse traces                       │
+                              │  - AgentOps session replay (post-show)   │
+                              └──────────────────────────────────────────┘</div>
+
+  <h3>Key Data Flows</h3>
+  <ol>
+    <li>Volunteer holds spacebar → mic → OpenAI Realtime returns transcribed text</li>
+    <li>Transcribed intent POSTed to FastAPI bridge <code>/api/run</code></li>
+    <li>FastAPI invokes LangGraph supervisor with the intent</li>
+    <li>CEO agent decides routing, calls <code>route_to_marketing</code> (or multiple in parallel)</li>
+    <li>Each tool call streams <code>update</code> events back via AG-UI SSE</li>
+    <li>CopilotKit <code>useCoAgentStateRender</code> lights up the right node in React Flow</li>
+    <li>Specialist agents stream their token output to the chat panel</li>
+    <li>CEO synthesizes and returns final response</li>
+  </ol>
+
+  <div class="callout gold">
+    <div class="callout-title">★ Two Day-0 Decisions to Lock</div>
+    <p><strong>1. Polyglot vs. TS-only?</strong> Polyglot (Python backend + TS frontend) wins because LangGraph Studio's graph visualizer is too valuable to give up. Recommendation: <strong>polyglot</strong>.</p>
+    <p><strong>2. Self-host CopilotKit runtime vs. Cloud?</strong> Self-host on Vercel — one fewer external dependency on demo day. Recommendation: <strong>self-host</strong>.</p>
+  </div>
+
+  <div class="page-footer">
+    <span><span class="brand">Jarvis Build Guide</span></span>
+    <span>Page 4 · Architecture</span>
+  </div>
+</div>
+
+<!-- ====== PAGE 5: 7-DAY BACKEND BUILD SPRINT ====== -->
+<div class="page">
+  <span class="doc-tag">Build Sprint · Backend (Days 1-7)</span>
+
+  <h1>Backend Build Sprint</h1>
+  <div class="subtitle">Daily target: 6-8 hours of focused build with Claude Code. Each day ends with a deliverable that's verifiable. No "code in progress."</div>
+
+  <div class="day-card">
+    <div class="day-num">DAY 1 · SAT · SCAFFOLD &amp; HELLO WORLD</div>
+    <div class="day-title">A running Next.js app with one Claude call streaming to a React chat.</div>
+    <ul>
+      <li><code>git clone CopilotKit/canvas-with-langgraph-python</code> — rename, push to your repo</li>
+      <li><code>git clone anthropics/claude-agent-sdk-demos</code> — study <code>research-agent/</code> and <code>simple-chat-app/</code></li>
+      <li>Install: <code>pnpm install</code> frontend, <code>uv pip install</code> Python backend</li>
+      <li>Replace canvas LLM with <code>ChatAnthropic(model="claude-sonnet-4-5-20250929")</code></li>
+      <li>Verify streaming: type "hello", see tokens stream</li>
+      <li>Set up Anthropic API key + LangSmith tracing</li>
+      <li>Read <code>anthropics/claude-cookbooks/patterns/agents/orchestrator_workers.ipynb</code> cover-to-cover</li>
+    </ul>
+    <div class="day-deliverable">▶ End-to-end chat with Claude, streaming visible, LangSmith trace appears.</div>
+  </div>
+
+  <div class="day-card">
+    <div class="day-num">DAY 2 · SUN · DEFINE THE AGENTS</div>
+    <div class="day-title">CEO + 3 department agents wired in LangGraph supervisor pattern.</div>
+    <ul>
+      <li>Install <code>langgraph-supervisor</code></li>
+      <li>Write 4 system prompts (CEO, Marketing, Sales, Operations) — borrow wholesale from <code>purely-personal:marketing-engine</code>, <code>sales-engine</code>, <code>operations-engine</code> skills you already have (massive shortcut)</li>
+      <li><code>create_supervisor([marketing, sales, ops], model=ChatAnthropic(...))</code></li>
+      <li>Test text-only: "Plan this week's content" should route to Marketing, return real LinkedIn drafts</li>
+      <li>Add prompt caching to CEO system prompt (saves ~60% latency)</li>
+    </ul>
+    <div class="day-deliverable">▶ Curl the FastAPI endpoint with text intent, see all 4 agents fire in trace, real content returned.</div>
+  </div>
+
+  <div class="day-card">
+    <div class="day-num">DAY 3 · MON · ORG-CHART VISUAL</div>
+    <div class="day-title">React Flow with CEO + 3 department nodes that light up when active.</div>
+    <ul>
+      <li>Install <code>@xyflow/react</code></li>
+      <li>Build 4 custom node types: <code>&lt;CeoNode /&gt;</code>, <code>&lt;DeptNode /&gt;</code> with <code>idle | thinking | done</code> states</li>
+      <li>Animated edges (<code>animated: true</code>) when messages flow</li>
+      <li>Wire <code>useCoAgent</code> hook from CopilotKit to subscribe to LangGraph state updates</li>
+      <li>Sub-agent fires → set node state to <code>thinking</code>; returns → <code>done</code></li>
+      <li>Polish: custom Tailwind colors per department, glow effect on active nodes</li>
+    </ul>
+    <div class="day-deliverable">▶ Type "create LinkedIn content" → CEO node pulses → Marketing node lights up → returns. Audience sees the routing.</div>
+  </div>
+
+  <div class="day-card">
+    <div class="day-num">DAY 4 · TUE · DRILLDOWN + GENERATIVE UI</div>
+    <div class="day-title">Click Marketing → expands to sub-categories → real work happens.</div>
+    <ul>
+      <li><code>useCoAgentStateRender</code> to render generative UI cards as agents work</li>
+      <li>Per department, define 3 sub-tools (Marketing → <code>draft_linkedin</code>, <code>draft_newsletter</code>, <code>draft_x_thread</code>)</li>
+      <li>Expand/collapse animation in React Flow when CEO node is "clicked"</li>
+      <li>Re-use <code>purely-personal:marketing-engine</code> prompts as Marketing agent's tool implementations</li>
+    </ul>
+    <div class="day-deliverable">▶ Day 1 demo flow works end-to-end via text. "Click Marketing → Content → 'Plan this week'" produces 3 real LinkedIn posts streaming live.</div>
+  </div>
+
+  <div class="day-card">
+    <div class="day-num">DAY 5 · WED · VOICE INPUT</div>
+    <div class="day-title">Push-to-talk volunteer can speak and the system reacts.</div>
+    <ul>
+      <li><code>git clone openai/openai-realtime-agents</code> for reference</li>
+      <li>Add WebRTC voice component — use <code>pipecat-ai/voice-ui-kit</code> or roll your own with Web Audio API + OpenAI Realtime</li>
+      <li>Bind spacebar to push-to-talk; OpenAI Realtime <em>only</em> for transcription, then forward transcript to LangGraph pipeline</li>
+      <li><strong>Critical:</strong> Manual override — if voice fails on stage, type same intent in &lt;2 seconds. Hidden Cmd+T toggle.</li>
+      <li>Pre-script 5 stage commands and rehearse with audience-noise simulation</li>
+    </ul>
+    <div class="day-deliverable">▶ Speak "create this week's LinkedIn content" → see content stream in.</div>
+  </div>
+
+  <div class="day-card">
+    <div class="day-num">DAY 6 · THU · SHOWSTOPPER · MULTI-DEPT ORCHESTRATION</div>
+    <div class="day-title">"Hey team, plan this week" fires Marketing + Sales + Ops in parallel, with inter-agent visible "talking."</div>
+    <ul>
+      <li>In LangGraph, define meta-tool that CEO uses to dispatch to multiple departments simultaneously</li>
+      <li>Use Claude Sonnet 4.5's parallel tool calls (fires multiple in one turn)</li>
+      <li>Visualize parallel execution: 3 nodes glow simultaneously, edges animate</li>
+      <li>Synthesis step where CEO node aggregates the three outputs into a unified weekly plan</li>
+      <li>Department-color tokens stream into chat in distinct columns or with avatars</li>
+    </ul>
+    <div class="day-deliverable">▶ Day 2 showstopper works. Voice → 3 departments fire in parallel → CEO synthesizes → coherent weekly business plan in &lt;30 seconds.</div>
+  </div>
+
+  <div class="day-card">
+    <div class="day-num">DAY 7 · FRI · HARDENING + REHEARSAL</div>
+    <div class="day-title">Demo-day reliable. No hot fixes.</div>
+    <ul>
+      <li><strong>Reliability:</strong> Cache prompts, retry logic on every Anthropic call (1 retry, 1.5s backoff), pre-warm with no-op call on stage entry</li>
+      <li><strong>Local fallback:</strong> Hard-code "Plan B" canned response that triggers if any agent times out &gt;15s. Audience never knows.</li>
+      <li><strong>Rehearse:</strong> Run full Day 1 + Day 2 demo 5× back-to-back. Time it. Each segment lands &lt;60s of agent thinking.</li>
+      <li>Friend makes audience noise during voice tests</li>
+      <li>Record dry run, watch back at 2× to spot dead air</li>
+      <li>Deploy to Vercel with stable URL. Pin SDK versions.</li>
+      <li>Plug laptop into projector, test colors and font sizes from row 20 of fake auditorium</li>
+      <li>Print one-page run-of-show, tape to laptop</li>
+    </ul>
+    <div class="day-deliverable">▶ Demo is muscle memory. You can run it half-asleep.</div>
+  </div>
+
+  <div class="page-footer">
+    <span><span class="brand">Jarvis Build Guide</span></span>
+    <span>Page 5 · Backend Sprint</span>
+  </div>
+</div>
+
+<!-- ====== PAGE 6: 7-DAY VISUAL BUILD SPRINT ====== -->
+<div class="page">
+  <span class="doc-tag">Build Sprint · Visual (Days 1-7)</span>
+
+  <h1>Visual Build Sprint</h1>
+  <div class="subtitle">Run in parallel with backend (or sequentially after). Every day ends with a stage test — does it look good projected at 4K from 30 feet away?</div>
+
+  <div class="day-card">
+    <div class="day-num">DAY 1 · SCAFFOLD (8 HRS)</div>
+    <div class="day-title">Empty stage with dark backdrop and CEO core visible. Nothing interactive.</div>
+    <ul>
+      <li><code>npx create-next-app@latest jarvis-stage --ts --tailwind --app</code></li>
+      <li><code>npm i motion @arwes/react @xyflow/react @tsparticles/react @tsparticles/preset-links three @react-three/fiber @react-three/drei @react-three/postprocessing howler ai flowtoken</code></li>
+      <li><code>npx shadcn@latest init</code> then add <code>button card</code></li>
+      <li>Tailwind theme: copy SMUI's color tokens; CSS vars <code>--neon-cyan: #00d4ff</code>, <code>--neon-amber: #ffa500</code>, <code>--bg-void: #050810</code></li>
+      <li><code>app/layout.tsx</code> — full-bleed dark, JetBrains Mono on body</li>
+      <li><code>components/Backdrop/ParticleField.tsx</code> — tsParticles <code>links</code> preset, opacity 0.3</li>
+      <li><code>components/Backdrop/VideoLayer.tsx</code> — looping video, <code>mix-blend-mode: screen</code>, opacity 0.15. Higgsfield/Seedance backdrops live here.</li>
+      <li><code>components/Scene/CEOCore.tsx</code> — R3F Canvas with Sphere + MeshDistortMaterial (emissive cyan, intensity 2) + Bloom postprocessing</li>
+      <li>Stage test: project on TV. CEO core glow real or gradient blob?</li>
+    </ul>
+  </div>
+
+  <div class="day-card">
+    <div class="day-num">DAY 2 · MOTION (8 HRS)</div>
+    <div class="day-title">Volunteer presses node → expand → sub-panels stagger in.</div>
+    <ul>
+      <li>Wrap app in <code>&lt;AnimatorGeneralProvider duration={{ enter: 0.6, exit: 0.4 }}&gt;</code></li>
+      <li><code>DepartmentNode.tsx</code> — Animator wrapper, FrameSVGOctagon chrome, motion.div for press scale</li>
+      <li>Position 3 nodes around CEO at 120° intervals (polar math)</li>
+      <li><code>DepartmentPanel.tsx</code> — Motion variants with <code>staggerChildren: 0.08</code></li>
+      <li>AnimatePresence so panels animate out when collapsing</li>
+      <li>GSAP timeline for boot sequence — CEO fades up, nodes stagger clockwise, text labels fade. Run on mount.</li>
+      <li>Stage test: practice press 10×. Cinematic or jittery?</li>
+    </ul>
+  </div>
+
+  <div class="day-card">
+    <div class="day-num">DAY 3 · STREAMING TEXT (6 HRS)</div>
+    <div class="day-title">Each agent panel has streaming text feed when "thinking."</div>
+    <ul>
+      <li><code>app/api/chat/route.ts</code> — Vercel AI SDK <code>streamText</code> endpoint to Claude</li>
+      <li><code>AgentFeed.tsx</code> — uses <code>useChat</code> from <code>ai/react</code></li>
+      <li>Wrap each token in flowtoken <code>&lt;SmoothText animation="blurIn" animationDuration="600ms"&gt;</code></li>
+      <li>"Thinking" shimmer state before first token — Magic UI Skeleton with slow gradient sweep</li>
+      <li><strong>Build a fake mode</strong> (env flag) — pre-recorded responses played token-by-token. <strong>You will not trust live LLM on stage.</strong></li>
+      <li>Stage test: from 30ft does text read? Min font-size 24px.</li>
+    </ul>
+  </div>
+
+  <div class="day-card">
+    <div class="day-num">DAY 4 · INTER-AGENT LINES (6 HRS)</div>
+    <div class="day-title">When two agents collaborate, glowing line traces between them.</div>
+    <ul>
+      <li><strong>Path A (recommended):</strong> Magic UI <code>&lt;AnimatedBeam&gt;</code>. Pass refs, set <code>gradientStartColor</code> + <code>pathColor</code>. ~30 lines total.</li>
+      <li><strong>Path B (more flex):</strong> xyflow with custom <code>&lt;AnimatedSVGEdge&gt;</code>. Good if network graph is the WHOLE layout.</li>
+      <li><code>useAgentEventBus()</code> — pub/sub keyed off agent IDs; emits <code>("marketing", "sales", "data-flow")</code></li>
+      <li>Layer 3 beams at different opacities/widths for chunky-glow feel (single beam looks anemic)</li>
+      <li>Stage test: trigger 5 connections at once, anything stutter?</li>
+    </ul>
+  </div>
+
+  <div class="day-card">
+    <div class="day-num">DAY 5 · SOUND (5 HRS)</div>
+    <div class="day-title">UI clicks, boot whoosh, comms blip when agents talk, ambient hum.</div>
+    <ul>
+      <li>Download from Zapsplat: Sci-Fi Console Beeps · UI Tones · Atmospheres</li>
+      <li>Combine into MP3 sprite via <code>audiosprite</code> CLI</li>
+      <li><code>lib/sound.ts</code> — Howler instance with sprite map: <code>{ press: [0,320], confirm: [400,600], comms: [1100,800], whoosh: [2200,1500], hum: [4000,12000,true] }</code></li>
+      <li><code>useSound("press")</code> hook returns play function</li>
+      <li>Wire: hover → comms (low) · press → confirm · expand → whoosh · inter-agent → comms · background → loop hum at 0.15</li>
+      <li><strong>Test on actual stage PA system, not laptop speakers.</strong> Mix changes completely.</li>
+    </ul>
+  </div>
+
+  <div class="day-card">
+    <div class="day-num">DAY 6 · POLISH (8 HRS)</div>
+    <div class="day-title">Cut everything that looks cheesy. Run the audit.</div>
+    <ul>
+      <li><strong>3-layer depth audit</strong> — every screen has foreground (sharp, full opacity), midground (40-60%, slight blur), background (10-20%, heavy blur)</li>
+      <li><strong>Easing curves audit</strong> — replace any default linear / ease-in-out with <code>cubic-bezier(0.16, 1, 0.3, 1)</code> (expo out)</li>
+      <li><strong>Glow falloff audit</strong> — CSS box-shadows with hard edges = cheesy. Use radial gradients or R3F bloom. If box-shadow, layer 3 at increasing blur, decreasing opacity.</li>
+      <li><strong>Color temperature audit</strong> — ONE neon (cyan), one accent (amber), grayscale rest. Two neons max.</li>
+      <li><strong>Text density audit</strong> — every dense block needs a "rest" moment. Empty space, micro-divider lines, ambient glyphs.</li>
+      <li>Run full demo end-to-end 3 times. Find anything that breaks.</li>
+    </ul>
+  </div>
+
+  <div class="day-card">
+    <div class="day-num">DAY 7 · STAGE REHEARSAL (FULL DAY AT VENUE)</div>
+    <div class="day-title">Lock everything. Build the kill-switch. Sleep.</div>
+    <ul>
+      <li>Project at venue resolution. Re-test contrast at viewing distance.</li>
+      <li>Test with house lighting at presentation level (not studio dark).</li>
+      <li>Test audio through PA. Adjust hum + bleeps mix.</li>
+      <li><strong>Build kill-switch</strong> — single key (Esc) fades everything to black gracefully if anything goes wrong.</li>
+      <li><strong>Build fake-mode toggle</strong> that stays in fake mode no matter what — backup if internet flakes.</li>
+      <li>Record screen capture of demo for post-event highlight reel.</li>
+      <li>Sleep.</li>
+    </ul>
+  </div>
+
+  <div class="page-footer">
+    <span><span class="brand">Jarvis Build Guide</span></span>
+    <span>Page 6 · Visual Sprint</span>
+  </div>
+</div>
+
+<!-- ====== PAGE 7: SOUND DESIGN ====== -->
+<div class="page">
+  <span class="doc-tag">Sound Design · Stage PA Mixing</span>
+
+  <h1>Sound Effect Sourcing</h1>
+  <div class="subtitle">A bleep that fires just before the visual change makes the visual feel decisive. 60ms head-start makes the press feel like it caused the expansion.</div>
+
+  <h2>Royalty-Free Libraries</h2>
+  <table>
+    <tr><th style="width:20%">Source</th><th>Best for</th></tr>
+    <tr><td class="label">Zapsplat</td><td>The biggest free sci-fi UI bank. Requires free account. zapsplat.com/sound-effect-category/science-fiction/</td></tr>
+    <tr><td class="label">Freesound.org</td><td>Community uploads, varied quality. CC-licensed.</td></tr>
+    <tr><td class="label">Mixkit</td><td>Curated, free, no account needed for many. mixkit.co/free-sound-effects/sci-fi/</td></tr>
+    <tr><td class="label">BBC Sound Effects</td><td>Free for personal/educational. Atmospheric beds. sound-effects.bbcrewind.co.uk</td></tr>
+    <tr><td class="label">Pixabay Audio</td><td>Free commercial use, no attribution required.</td></tr>
+  </table>
+
+  <h2>Specific Zapsplat Packs to Download Day 5</h2>
+  <ul>
+    <li><strong>Sci-Fi Console Beeps</strong> (130 sounds) — for press / hover</li>
+    <li><strong>Sci-Fi UI Tones</strong> (113 sounds) — for confirm / select</li>
+    <li><strong>Sci-Fi Computer Tones</strong> (34 sounds)</li>
+    <li><strong>Sci-Fi Atmospheres</strong> — for ambient hum bed</li>
+  </ul>
+
+  <h2>Search Terms That Find the Good Stuff</h2>
+  <table>
+    <tr><th style="width:25%">Category</th><th>Queries</th></tr>
+    <tr><td class="label">UI clicks</td><td><code>interface beep clean</code> · <code>confirm select hi-tech</code> · <code>menu button futuristic</code> · <code>holographic tap</code> · <code>JARVIS interface</code> · <code>tactical UI</code></td></tr>
+    <tr><td class="label">Boot / reveal</td><td><code>system online whoosh</code> · <code>power up sci-fi rise</code> · <code>interface activate sweep</code> · <code>holographic materialize</code> · <code>tron grid expand</code></td></tr>
+    <tr><td class="label">Comms / collab</td><td><code>transmission start</code> · <code>data transfer beep</code> · <code>signal lock</code> · <code>comms ping</code> · <code>network handshake</code></td></tr>
+    <tr><td class="label">Ambient hum</td><td><code>spaceship interior drone</code> · <code>sci-fi atmosphere room tone</code> · <code>command center ambient</code> · <code>cyber drone low</code></td></tr>
+  </table>
+
+  <h2>The Exact 8-Sound Sprite</h2>
+  <table>
+    <tr><th style="width:18%">Sound</th><th style="width:14%">Duration</th><th>Use</th></tr>
+    <tr><td class="label">press</td><td>200-400ms</td><td>Short clean click. Default press.</td></tr>
+    <tr><td class="label">confirm</td><td>400-600ms</td><td>Slightly longer + tonal. Big actions.</td></tr>
+    <tr><td class="label">hover</td><td>&lt;200ms</td><td>Sub-200ms airy whisper, very low volume.</td></tr>
+    <tr><td class="label">whoosh</td><td>800-1500ms</td><td>Panel expansion.</td></tr>
+    <tr><td class="label">comms-ping</td><td>600-900ms</td><td>Agent-to-agent line fires.</td></tr>
+    <tr><td class="label">boot</td><td>2-4s</td><td>Reserved for stage opener only.</td></tr>
+    <tr><td class="label">error</td><td>300ms</td><td>Red-flash moment. Insurance.</td></tr>
+    <tr><td class="label">hum-bed</td><td>8-15s loop</td><td>Plays at 0.12 volume the entire demo.</td></tr>
+  </table>
+
+  <h2 class="gold">Mixing for Stage PA · CRITICAL</h2>
+  <table>
+    <tr><th style="width:30%">Sound</th><th>Mix Level</th></tr>
+    <tr><td class="label">Hum bed</td><td><code>-22 dB</code> · sits UNDER spoken voice without competing</td></tr>
+    <tr><td class="label">UI clicks</td><td><code>-8 to -10 dB</code> · audible but never punchy</td></tr>
+    <tr><td class="label">Whoosh / boot</td><td><code>-6 dB</code> · theatrical moments, let them have weight</td></tr>
+  </table>
+
+  <div class="callout gold">
+    <div class="callout-title">★ The Lavalier Mic Problem</div>
+    <p>If the presenter is on a lav mic, the venue audio engineer mixes the laptop into a different bus. <strong>Make sure they have a stem with just your demo audio</strong> so they can ride the level live. <strong>Test on the actual venue PA — laptop speaker mixing lies to you.</strong></p>
+  </div>
+
+  <div class="page-footer">
+    <span><span class="brand">Jarvis Build Guide</span></span>
+    <span>Page 7 · Sound Design</span>
+  </div>
+</div>
+
+<!-- ====== PAGE 8: 14 RULES ====== -->
+<div class="page">
+  <span class="doc-tag">The 14 Rules · Tron vs Amateur</span>
+
+  <h1>Make It Look Real</h1>
+  <div class="subtitle">These are the things that separate Tron from Kid's Show. Every rule is one specific implementation. No vague "use good design."</div>
+
+  <div class="rule-grid">
+    <div class="rule-card">
+      <div class="rule-num">RULE 1</div>
+      <div class="rule-title">Three-layer depth — always</div>
+      <div class="rule-body">Every frame has 3 z-depths: Foreground (z:100, sharp, full opacity, full saturation), Midground (z:50, opacity 0.4-0.6, slight blur), Background (z:0, opacity 0.1-0.2, heavy blur, desaturated).</div>
+    </div>
+    <div class="rule-card">
+      <div class="rule-num">RULE 2</div>
+      <div class="rule-title">Glow falloff — never single box-shadow</div>
+      <div class="rule-body">Bad: <code>box-shadow: 0 0 20px cyan</code> = Geocities. Good: layer 3 stacked shadows mimicking real light bloom. Better: R3F Bloom on emissive material with intensity &gt;1.</div>
+    </div>
+    <div class="rule-card">
+      <div class="rule-num">RULE 3</div>
+      <div class="rule-title">Easing curves — never linear, never default ease-in-out</div>
+      <div class="rule-body">Default UI: <code>cubic-bezier(0.16, 1, 0.3, 1)</code> (expo out). Critical moments: <code>cubic-bezier(0.87, 0, 0.13, 1)</code> (expo in-out, "fluid intelligence"). Never Tailwind's <code>transition-all</code>.</div>
+    </div>
+    <div class="rule-card">
+      <div class="rule-num">RULE 4</div>
+      <div class="rule-title">Opacity rhythm — never 100% on text below the fold</div>
+      <div class="rule-body">Active panel headline 100%, body 80%, labels 60%. Adjacent panel everything 50% × those values. Breathable hierarchy without changing color.</div>
+    </div>
+    <div class="rule-card">
+      <div class="rule-num">RULE 5</div>
+      <div class="rule-title">The Ambient Text rule (Jayse Hansen's secret)</div>
+      <div class="rule-body">Iron Man HUD looks alive because of UNREADABLE micro-text everywhere. Ring of tiny rotating coordinates, numerical readouts updating every 200ms with random-but-bounded values, glyphs at periphery. None means anything. Sells "this is alive."</div>
+    </div>
+    <div class="rule-card">
+      <div class="rule-num">RULE 6</div>
+      <div class="rule-title">Every interactive element has 3 states + hover bleed</div>
+      <div class="rule-body">Idle (60% opacity, soft glow), Hover (100%, brighter glow, +1% scale, soft comms sound at 0.2 vol), Active (100%, full glow, slight rotation 1deg, confirm sound). Press → release has 200ms decay where glow dims back.</div>
+    </div>
+    <div class="rule-card">
+      <div class="rule-num">RULE 7</div>
+      <div class="rule-title">Neon palette discipline</div>
+      <div class="rule-body">Pick exactly 2 neons. Cyan #00d4ff for "alive", Amber #ffa500 for "alert/active". Everything else grayscale. Third neon = Christmas tree. Brief red flash for error only as momentary state.</div>
+    </div>
+    <div class="rule-card">
+      <div class="rule-num">RULE 8</div>
+      <div class="rule-title">Frame chrome is structural, not decorative</div>
+      <div class="rule-body">Use Arwes <code>&lt;FrameSVGOctagon&gt;</code> or hand-built SVGs. The 45° chamfer at top-right and bottom-left reads as "engineered," not "rectangular box." Without this, your panels look like Bootstrap cards.</div>
+    </div>
+    <div class="rule-card">
+      <div class="rule-num">RULE 9</div>
+      <div class="rule-title">The 1.5× animation rule</div>
+      <div class="rule-body">Motion that feels right at 1.0× in dev tools feels rushed on stage. Build with <code>globalMotion = 1.5</code> multiplier and tune. Audience needs reaction time.</div>
+    </div>
+    <div class="rule-card">
+      <div class="rule-num">RULE 10</div>
+      <div class="rule-title">Negative space audit</div>
+      <div class="rule-body">At any moment, ≥40% of screen is dark/empty. If full of panels, cut. Blade Runner 2049 has shots where 80% of frame is black. Eye needs rest to register magic.</div>
+    </div>
+    <div class="rule-card">
+      <div class="rule-num">RULE 11</div>
+      <div class="rule-title">Sub-pixel grid alignment</div>
+      <div class="rule-body">Every element on a 4px grid (Tailwind defaults match). Misaligned by 2px = amateur dashboard. Use <code>grid</code> and <code>gap-4</code> everywhere.</div>
+    </div>
+    <div class="rule-card">
+      <div class="rule-num">RULE 12</div>
+      <div class="rule-title">Don't animate everything at once</div>
+      <div class="rule-body">Stagger. 3 panels appear at 0ms, 150ms, 300ms — not all together. Apply to every group of &gt;1 element. Motion's <code>staggerChildren</code> makes this trivial.</div>
+    </div>
+    <div class="rule-card">
+      <div class="rule-num">RULE 13</div>
+      <div class="rule-title">Sound timing locks visual</div>
+      <div class="rule-body">Bleep that fires JUST BEFORE visual change makes change feel decisive. <code>playSound('confirm'); setTimeout(triggerExpand, 60)</code>. 60ms head-start makes press feel like it CAUSED expansion.</div>
+    </div>
+    <div class="rule-card">
+      <div class="rule-num">RULE 14</div>
+      <div class="rule-title">Backdrop video tricks</div>
+      <div class="rule-body">Higgsfield/Seedance clips with <code>mix-blend-mode: screen</code> or <code>lighten</code> and opacity 0.12-0.18 lets cinematic energy bleed through without competing with UI. NEVER full opacity behind UI — eats contrast.</div>
+    </div>
+  </div>
+
+  <div class="page-footer">
+    <span><span class="brand">Jarvis Build Guide</span></span>
+    <span>Page 8 · The 14 Rules</span>
+  </div>
+</div>
+
+<!-- ====== PAGE 9: RISKS ====== -->
+<div class="page">
+  <span class="doc-tag">Risks &amp; Mitigations</span>
+
+  <h1>What Will Go Wrong</h1>
+  <div class="subtitle">Plan for failure. Have a recovery for every plausible disaster. The kill-switch has saved more demos than any retry logic.</div>
+
+  <table>
+    <tr><th>Risk</th><th style="width:14%">Likelihood</th><th style="width:14%">Impact</th><th>Mitigation</th></tr>
+    <tr>
+      <td class="label">Voice fails in noisy room</td>
+      <td><strong style="color:#ec4357">High</strong></td>
+      <td><strong style="color:#ec4357">Show-stopper</strong></td>
+      <td>Push-to-talk only. Pre-test with 80dB noise loop. Hidden Cmd+T fallback. <strong>Don't use open-mic VAD on stage.</strong></td>
+    </tr>
+    <tr>
+      <td class="label">Anthropic API rate-limit / outage</td>
+      <td>Medium</td>
+      <td><strong style="color:#ec4357">Show-stopper</strong></td>
+      <td>Pre-cache prompts. Recorded video fallback for each segment. Tier 4+ account.</td>
+    </tr>
+    <tr>
+      <td class="label">Inter-agent latency &gt;20s</td>
+      <td>Medium</td>
+      <td>Pacing kill</td>
+      <td>Sonnet 4.5 (2× faster than 4.0). Haiku 4.5 for routing if too slow. <code>parallel_tool_calls</code>. Pre-warm with no-op call on entry.</td>
+    </tr>
+    <tr>
+      <td class="label">WebSocket / SSE drops mid-demo</td>
+      <td>Low</td>
+      <td>Visible glitch</td>
+      <td>Vercel HTTP/2 SSE. Test on hotel WiFi. Hotspot backup.</td>
+    </tr>
+    <tr>
+      <td class="label">CopilotKit + assistant-ui collision</td>
+      <td>Medium</td>
+      <td>Build delay</td>
+      <td>Pick ONE chat shell on Day 1. Don't run both.</td>
+    </tr>
+    <tr>
+      <td class="label">LangGraph supervisor loops / hallucinates routing</td>
+      <td>Low-Med</td>
+      <td>Wrong department fires</td>
+      <td>Add <code>routing_confidence</code> field. If &lt;0.7, default to "general" + ask. Pre-script 3 demo intents, bake routing via few-shot.</td>
+    </tr>
+    <tr>
+      <td class="label">Agent produces bad/embarrassing content live</td>
+      <td>Low-Med</td>
+      <td>Brand risk</td>
+      <td>Content validator step (Haiku checks length + no profanity). Pre-script demo prompts to known-good output range.</td>
+    </tr>
+    <tr>
+      <td class="label">Over-engineering visualization</td>
+      <td><strong style="color:#ec4357">High</strong></td>
+      <td>Time sink</td>
+      <td>Day 3 boxed at 1 day. If React Flow is fighting you by lunch, fall back to CSS Grid + motion-react and ship. Audience cares about story, not prettiness.</td>
+    </tr>
+    <tr>
+      <td class="label">Vendor lock-in to OpenAI for voice</td>
+      <td>Low</td>
+      <td>Narrative ding</td>
+      <td>Voice is just transcription, not reasoning. Pitch is "Claude reasoning, OpenAI ears." Swap to Pipecat + Deepgram in 1 day post-show if needed.</td>
+    </tr>
+    <tr>
+      <td class="label">Polyglot deployment friction</td>
+      <td>Medium</td>
+      <td>Day 7 hassle</td>
+      <td>Vercel for frontend, Railway/Fly for Python backend. OR use AI SDK's TS-native ToolLoopAgent (loses LangGraph Studio).</td>
+    </tr>
+  </table>
+
+  <div class="callout gold">
+    <div class="callout-title">★ The Kill-Switch (Build This Day 7)</div>
+    <p>Bind <code>Esc</code> to a state that fades all panels out and shows just the CEO core with one line: <strong>"SYSTEM IDLE"</strong>. If anything goes wrong on stage, you press Esc, the visual stays intentional, and you say <em>"Let's pause here."</em></p>
+    <p><strong>This has saved more demos than any retry logic.</strong></p>
+  </div>
+
+  <div class="callout gold">
+    <div class="callout-title">★ The Fake-Mode Toggle</div>
+    <p>Build both modes. <strong>Default to fake mode for stage</strong> (deterministic, instant, no API failures). Use real mode in green room to record live demo for highlight reel.</p>
+    <p>Pre-recorded responses played token-by-token via flowtoken look identical to live. Audience cannot tell.</p>
+  </div>
+
+  <div class="page-footer">
+    <span><span class="brand">Jarvis Build Guide</span></span>
+    <span>Page 9 · Risks</span>
+  </div>
+</div>
+
+<!-- ====== PAGE 10: DAY 0 SETUP ====== -->
+<div class="page">
+  <span class="doc-tag">Day 0 · Start Here</span>
+
+  <h1>The Day-0 Setup</h1>
+  <div class="subtitle">Run these commands. In this order. Today.</div>
+
+  <h2>Repo Clone Order (Stack Rank)</h2>
+  <pre><code># 1. The monorepo skeleton
+git clone https://github.com/CopilotKit/canvas-with-langgraph-python.git jarvis-stage
+cd jarvis-stage
+
+# 2. The orchestrator pattern (study research-agent/)
+git clone https://github.com/anthropics/claude-agent-sdk-demos.git ../reference-anthropic
+
+# 3. The multi-agent UI pattern
+git clone https://github.com/CopilotKit/open-multi-agent-canvas.git ../reference-multiagent
+
+# 4. READ patterns/agents/ before writing code
+git clone https://github.com/anthropics/claude-cookbooks.git ../reference-cookbooks
+
+# 5. Voice front-end reference (Day 5)
+git clone https://github.com/openai/openai-realtime-agents.git ../reference-voice</code></pre>
+
+  <h2>Frontend Install (Visual Stack)</h2>
+  <pre><code># Inside jarvis-stage/
+npm i motion @arwes/react @xyflow/react \
+      @tsparticles/react @tsparticles/preset-links \
+      three @react-three/fiber @react-three/drei \
+      @react-three/postprocessing \
+      howler ai flowtoken
+
+# shadcn primitives
+npx shadcn@latest init
+npx shadcn@latest add button card
+
+# Optional: Aceternity + Magic UI components (copy-paste, not npm)
+# Visit ui.aceternity.com and magicui.design — copy specific files.</code></pre>
+
+  <h2>Backend Install (Agent Stack)</h2>
+  <pre><code># Python backend (use uv for speed)
+cd backend/
+uv pip install langgraph langgraph-supervisor \
+               anthropic langchain-anthropic \
+               fastapi uvicorn
+
+# Set API keys
+export ANTHROPIC_API_KEY="sk-ant-..."
+export LANGCHAIN_API_KEY="ls__..."  # optional, for LangSmith tracing
+export LANGCHAIN_TRACING_V2="true"</code></pre>
+
+  <h2>The Two Day-0 Decisions</h2>
+  <table>
+    <tr><th style="width:32%">Decision</th><th>Recommendation</th></tr>
+    <tr><td class="label">Polyglot vs. TS-only?</td><td><strong>Polyglot.</strong> LangGraph Studio's graph visualizer alone justifies it.</td></tr>
+    <tr><td class="label">Self-host CopilotKit vs. Cloud?</td><td><strong>Self-host on Vercel.</strong> One fewer external dependency on demo day.</td></tr>
+  </table>
+
+  <div class="divider"></div>
+
+  <h2 class="gold">Already in Your Folder · Reference Material</h2>
+  <table>
+    <tr><th>File</th><th>Purpose</th></tr>
+    <tr><td><code>research/03-jarvis-build-stack.md</code></td><td>Full backend research (33KB) — read for nuance</td></tr>
+    <tr><td><code>research/04-jarvis-visual-stack.md</code></td><td>Full visual research (33KB) — read for nuance</td></tr>
+    <tr><td><code>research/05-jarvis-demo-flow.md</code></td><td>The exact demo flow on stage</td></tr>
+    <tr><td><code>research/07-execution-plan.md</code></td><td>Execution plan synthesizing all research</td></tr>
+    <tr><td><code>research/08-master-plan.md</code></td><td>Master plan (older iteration)</td></tr>
+    <tr><td><code>research/09-master-plan.md</code></td><td>Master plan (latest)</td></tr>
+    <tr><td><code>research/10-build-hollywood.md</code></td><td>Hollywood polish techniques</td></tr>
+    <tr><td><code>research/11-hollywood-polish.md</code></td><td>Additional polish</td></tr>
+    <tr><td><code>research/12-the-100x-additions.md</code></td><td>100× additions</td></tr>
+    <tr><td><code>research/13-1000x-repos.md</code></td><td>1000× repos</td></tr>
+  </table>
+
+  <div class="callout gold">
+    <div class="callout-title">★ Closing Note</div>
+    <p>The presenter is going to look like a magician. <strong>Make sure the magic is in the rehearsal, not the code.</strong></p>
+    <p>Days 1-5 lock in features. Days 6-7 are dedicated polish. Don't ship anything new on Day 7. The biggest risk is scope creep on Day 4 (inter-agent connections) — if not landing by end of Day 4, ship Path A (Magic UI AnimatedBeam) and move on. Don't fork xyflow at midnight on Day 5.</p>
+  </div>
+
+  <div class="page-footer">
+    <span><span class="brand">Jarvis Build Guide</span></span>
+    <span>Page 10 · Start Here</span>
+  </div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,64 @@
+---
+description: GBI 2026 project context — always-on. Sets ground rules for the build.
+alwaysApply: true
+---
+
+# GBI 2026 Stage Demo — Project Context
+
+You are working on **GBI 2026**, a Hollywood-grade Jarvis-style AI command center stage demo. Projected on a 50-foot screen for ~1000 people at GBI Singapore, May 14–17 2026. Single-laptop driven by the presenter (no operator).
+
+## Architecture (read this first)
+- **CEO orb** at center, **4 wings** orbiting it: CMO (Marketing), CRO (Sales), COO (Operations), CFO (Finance)
+- Each wing contains **3-4 sub-tools** (14 total): Instagram, LinkedIn, Article+Images, Video, Lead Scraper, Cold Email, Call Script, Sequence, Weekly Focus, Daily Priority, Process Audit, Cash Forecast, Pricing, P&L
+- **3-depth state machine** (XState v5): `idle → wingOpen → toolRunning`
+- **Framer Motion `layoutId`** is the morph primitive between depths — same easing curve everywhere: `[0.16, 1, 0.3, 1]`, 600ms
+
+## Hard rules (non-negotiable)
+1. **Static export only** — `output: 'export'` in next.config.js. NEVER run `next dev` on stage.
+2. **Chrome kiosk wrapper** — `chrome --kiosk --app=http://localhost:3000`. No Tauri for v1.
+3. **Wired HDMI only** — never AirPlay (200-400ms lag).
+4. **Body 64pt, headlines 96-128pt** — readable from 100ft. No sub-12px Retina text.
+5. **Black background only** — pure white causes ghosting on DLP projectors. Use `#E8EDF7`.
+6. **Two colors max** — Cyan `#00d4ff` + Amber `#ffa500` + void `#050810`. No third unless momentary error flash.
+7. **Single focal point per beat** — 80% of frame on the hero. Never split attention.
+8. **Audio leads visual by 60ms** — bleep fires before visual change. Makes presses feel decisive.
+9. **Every UI element traces to a film** — Iron Man HUD, Tron Legacy, Blade Runner 2049, Minority Report, Mission Impossible, Apple Vision Pro keynote. If no reference, don't ship.
+10. **Every sub-tool has 3 modes**: `live` (real APIs), `fake` (pre-rendered MP4), `safe` (last-frame PNG). `Cmd+F` flips to fake mid-show invisibly.
+
+## When making any decision, default to:
+- Reading `BUILD-MASTER.md` for canonical specs (file structure, dependencies, code patterns)
+- Reading `LIVE_DEMOS.md` for stage choreography
+- Invoking the appropriate skill rule (see other `.mdc` files in this directory) for implementation patterns
+
+## When you're about to write code, ask yourself:
+- Is there a film reference for this element?
+- Does it pass the 50-ft test (would the back row see it)?
+- Does it have a fake-mode fallback?
+- Does it use the canonical easing curve and color palette?
+
+If any answer is no, fix before shipping.
+
+## Current build phase
+Day 0 (pre-build). Day 1 starts with:
+1. Asset gathering (Musicbed tracks, LUT files, Lottie packs, voice clone via ElevenLabs (no avatar — pure orb + voice JARVIS aesthetic))
+2. `npx create-next-app@latest gbi-2026`
+3. XState 3-depth machine + 4-second GSAP boot sequence
+4. Apply LUT + grain + vignette to Seedance backdrops
+5. **Initialize Three.js r170+ with WebGPURenderer** (not standard r150)
+
+## ⚠ The 100× additions (final research pass — see research/12-the-100x-additions.md)
+
+These supersede parts of the original spec. NEVER skip these:
+
+1. **Audio-reactive orb (NOT a face/avatar)** — ElevenLabs Flash v2.5 voice clone of Danny + Tone.js waveform analyzer feeds R3F + TSL shader uniforms. The orb pulses, distorts, and glows with the voice. JARVIS aesthetic is voice + UI, never a face.
+2. **Model routing** — Haiku 4.5 for routing, Sonnet 4.5 for wings (with `interleaved-thinking-2025-05-14` beta header), **Opus 4.7 for CEO synthesis with task budgets**
+3. **WebGPU + TSL** for orb + particle systems (R3F r170+ WebGPURenderer)
+4. **Promptfoo eval gate** — every sub-tool must score ≥8.5 LLM-judge before shipping. NO exceptions.
+5. **KILL persona stacking** — proven to damage accuracy (PRISM paper). Use Expert Framework prompts instead.
+6. **Voice-locked agent stack** — cached voice corpus + de-ai-ify gate + style rubric judge regenerates if <7
+7. **CEO synthesis = conflict-resolver, NOT summarizer** — find conflict → resolve → surface non-obvious play
+8. **Few-shot examples mandatory** — 3-5 hand-curated reference outputs per wing (single biggest free quality lift)
+9. **Behavioral personality constraints** — NOT adjectives ("be playful" is useless; encode as enforced output contracts)
+10. **English only** — no multi-language captions, no translation chrome. CEO speaks English in Danny's cloned voice. Audience speaks English. Don't add language complexity.
+
+See `BUILD-MASTER.md` Section 0 (Quick Start) for exact commands. See `research/12-the-100x-additions.md` for the updated 7-day plan that incorporates these.

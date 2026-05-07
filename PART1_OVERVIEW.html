@@ -1,0 +1,771 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Part 1 — Overview & Strategy · GBI Singapore 2026</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  @page { size: A4; margin: 0; }
+
+  html, body {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+    color-adjust: exact;
+  }
+
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    color: #fff;
+    background: #1a1a1a;
+    line-height: 1.55;
+    font-size: 10.5pt;
+  }
+
+  .page {
+    width: 210mm;
+    min-height: 297mm;
+    margin: 0 auto;
+    background:
+      radial-gradient(ellipse at top right, #4a0d10 0%, #1a0204 45%, #0a0000 100%);
+    position: relative;
+    overflow: hidden;
+    padding: 18mm 18mm 14mm;
+    page-break-after: always;
+  }
+
+  .page:last-child { page-break-after: auto; }
+
+  /* HEADERS */
+  h1 {
+    font-weight: 900;
+    font-size: 36pt;
+    line-height: 1;
+    letter-spacing: -0.03em;
+    color: #ec4357;
+    text-transform: uppercase;
+    margin-bottom: 3mm;
+    text-shadow: 0 0 20px rgba(236,67,87,0.3);
+  }
+
+  h2 {
+    font-weight: 800;
+    font-size: 16pt;
+    line-height: 1.15;
+    color: #fff;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+    margin-top: 8mm;
+    margin-bottom: 3mm;
+    padding-bottom: 1.5mm;
+    border-bottom: 1.5pt solid #ec4357;
+  }
+
+  h2.gold { border-bottom-color: #fbbf24; color: #fbbf24; }
+
+  h3 {
+    font-weight: 700;
+    font-size: 12pt;
+    color: #ec4357;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-top: 5mm;
+    margin-bottom: 2mm;
+  }
+
+  h3.gold { color: #fbbf24; }
+
+  .doc-tag {
+    display: inline-block;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 8.5pt;
+    font-weight: 600;
+    letter-spacing: 0.18em;
+    color: #fbbf24;
+    background: rgba(251,191,36,0.1);
+    border: 1pt solid rgba(251,191,36,0.4);
+    border-radius: 1.5mm;
+    padding: 1mm 3mm;
+    margin-bottom: 4mm;
+    text-transform: uppercase;
+  }
+
+  .subtitle {
+    font-size: 12pt;
+    font-weight: 500;
+    color: #d8d8d8;
+    margin-bottom: 6mm;
+    line-height: 1.4;
+    font-style: italic;
+  }
+
+  /* PARAGRAPHS */
+  p {
+    margin-bottom: 3mm;
+    color: #e5e5e5;
+  }
+
+  p strong { color: #fff; font-weight: 700; }
+  p em { color: #fbbf24; font-style: italic; }
+
+  /* TABLES */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 3mm 0 4mm;
+    font-size: 9.5pt;
+  }
+
+  table th {
+    background: rgba(236,67,87,0.15);
+    color: #ec4357;
+    text-align: left;
+    padding: 2mm 3mm;
+    font-weight: 800;
+    font-size: 8.5pt;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    border-bottom: 1.5pt solid #ec4357;
+  }
+
+  table td {
+    padding: 2mm 3mm;
+    border-bottom: 1pt solid rgba(255,255,255,0.1);
+    color: #d8d8d8;
+    vertical-align: top;
+  }
+
+  table td.label { font-weight: 700; color: #fff; }
+  table td.num { text-align: right; font-variant-numeric: tabular-nums; color: #fbbf24; font-weight: 700; }
+
+  /* CALLOUT BOXES */
+  .callout {
+    background: rgba(15,5,5,0.7);
+    border-left: 3pt solid #ec4357;
+    border-radius: 0 2mm 2mm 0;
+    padding: 3mm 4mm;
+    margin: 3mm 0 4mm;
+  }
+
+  .callout.gold {
+    border-left-color: #fbbf24;
+    background: linear-gradient(90deg, rgba(251,191,36,0.08), transparent);
+  }
+
+  .callout-title {
+    font-weight: 800;
+    font-size: 9.5pt;
+    letter-spacing: 0.08em;
+    color: #ec4357;
+    text-transform: uppercase;
+    margin-bottom: 1.5mm;
+  }
+
+  .callout.gold .callout-title { color: #fbbf24; }
+
+  .callout p {
+    font-size: 9.5pt;
+    margin-bottom: 1.5mm;
+    line-height: 1.5;
+  }
+
+  .callout p:last-child { margin-bottom: 0; }
+
+  /* QUOTES */
+  blockquote {
+    background: rgba(236,67,87,0.08);
+    border-left: 3pt solid #ec4357;
+    padding: 3mm 4mm;
+    margin: 3mm 0;
+    font-style: italic;
+    font-size: 11pt;
+    color: #fff;
+    border-radius: 0 2mm 2mm 0;
+  }
+
+  /* LISTS */
+  ul, ol {
+    margin: 2mm 0 3mm 6mm;
+  }
+
+  li {
+    margin-bottom: 1.2mm;
+    color: #e5e5e5;
+    line-height: 1.5;
+  }
+
+  li strong { color: #fff; }
+
+  /* CODE / MONO */
+  code {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9pt;
+    background: rgba(236,67,87,0.15);
+    color: #fbbf24;
+    padding: 0.5mm 1.5mm;
+    border-radius: 1mm;
+  }
+
+  /* HERO BANNER (page 1) */
+  .hero-banner {
+    background: #0a0204;
+    border: 2pt solid #ec4357;
+    border-radius: 3mm;
+    padding: 8mm;
+    margin-bottom: 8mm;
+    text-align: center;
+    box-shadow: 0 0 40px rgba(236,67,87,0.2);
+  }
+
+  .hero-banner .name {
+    font-weight: 900;
+    font-size: 48pt;
+    letter-spacing: -0.04em;
+    color: #ec4357;
+    line-height: 0.95;
+    text-shadow: 0 0 30px rgba(236,67,87,0.4);
+  }
+
+  .hero-banner .tag {
+    font-weight: 600;
+    font-size: 11pt;
+    color: #d8d8d8;
+    margin-top: 2mm;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+
+  /* STAT GRID */
+  .stat-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 3mm;
+    margin: 4mm 0;
+  }
+
+  .stat-card {
+    background: rgba(15,5,5,0.7);
+    border: 1pt solid #ec4357;
+    border-radius: 2mm;
+    padding: 4mm;
+    text-align: center;
+  }
+
+  .stat-card .num {
+    font-weight: 900;
+    font-size: 20pt;
+    color: #ec4357;
+    line-height: 1;
+    margin-bottom: 1mm;
+  }
+
+  .stat-card .label {
+    font-size: 8pt;
+    color: #d8d8d8;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    font-weight: 600;
+  }
+
+  /* ENERGY CURVE BLOCK */
+  .energy-block {
+    background: rgba(0,0,0,0.5);
+    border: 1pt solid rgba(236,67,87,0.4);
+    border-radius: 2mm;
+    padding: 5mm;
+    margin: 4mm 0;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 8.5pt;
+    line-height: 1.4;
+    color: #fbbf24;
+    white-space: pre;
+    overflow-x: auto;
+  }
+
+  /* PAGE FOOTER */
+  .page-footer {
+    position: absolute;
+    bottom: 8mm;
+    left: 18mm;
+    right: 18mm;
+    display: flex;
+    justify-content: space-between;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 7pt;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.4);
+    padding-top: 2mm;
+    border-top: 1pt solid rgba(255,255,255,0.1);
+  }
+
+  .page-footer .brand { color: #ec4357; font-weight: 700; }
+
+  /* DIVIDERS */
+  .divider {
+    height: 1pt;
+    background: linear-gradient(90deg, #ec4357, transparent);
+    margin: 5mm 0;
+  }
+
+  /* PRINT */
+  @media print {
+    body { background: #000; }
+    .page { box-shadow: none; }
+  }
+
+  @media screen {
+    body { padding: 24px 16px; background: #2a2a2a; }
+    .page {
+      box-shadow: 0 12px 50px rgba(0,0,0,0.6);
+      margin-bottom: 24px;
+    }
+  }
+</style>
+</head>
+<body>
+
+<!-- ========================== PAGE 1 ========================== -->
+<div class="page">
+
+  <span class="doc-tag">Part 1 of 4 · Overview &amp; Strategy</span>
+
+  <div class="hero-banner">
+    <div class="name">10X WITH AI</div>
+    <div class="tag">GBI Singapore 2026 · 3-Day Presentation Master Plan</div>
+  </div>
+
+  <h2>Slot Architecture</h2>
+
+  <table>
+    <tr>
+      <th style="width:14%">Day</th>
+      <th>Slot</th>
+      <th style="width:14%">Length</th>
+      <th>Goal</th>
+      <th style="width:14%">Sale</th>
+    </tr>
+    <tr>
+      <td class="label">Day 1</td>
+      <td>First content</td>
+      <td>75 min</td>
+      <td>Plant identity. One huge wow. Hook for Day 2.</td>
+      <td><strong style="color:#888">None</strong></td>
+    </tr>
+    <tr>
+      <td class="label">Day 2</td>
+      <td>Last session</td>
+      <td>90 min</td>
+      <td>Full pitch. Stack. 3 closes. Walk-to-back.</td>
+      <td><strong style="color:#ec4357">$1,997</strong></td>
+    </tr>
+    <tr>
+      <td class="label">Day 3</td>
+      <td>Breakout</td>
+      <td>60 min</td>
+      <td>Convert fence-sitters. Deepen for buyers.</td>
+      <td><strong style="color:#fbbf24">Soft re-pitch</strong></td>
+    </tr>
+    <tr>
+      <td class="label">Day 4</td>
+      <td>Mega/repeat</td>
+      <td>60 min</td>
+      <td>Mac bundle. Repeat for non-buyers.</td>
+      <td><em style="color:#888">Mac-led</em></td>
+    </tr>
+  </table>
+
+  <h2>The Numbers</h2>
+
+  <div class="stat-grid">
+    <div class="stat-card">
+      <div class="num">445</div>
+      <div class="label">People in room</div>
+    </div>
+    <div class="stat-card">
+      <div class="num">356</div>
+      <div class="label">English speakers</div>
+    </div>
+    <div class="stat-card">
+      <div class="num">~89</div>
+      <div class="label">Mandarin (China)</div>
+    </div>
+  </div>
+
+  <div class="stat-grid">
+    <div class="stat-card">
+      <div class="num">$1,997</div>
+      <div class="label">Offer price</div>
+    </div>
+    <div class="stat-card">
+      <div class="num">$37,964</div>
+      <div class="label">Stack value</div>
+    </div>
+    <div class="stat-card">
+      <div class="num">15-20%</div>
+      <div class="label">Conversion target</div>
+    </div>
+  </div>
+
+  <div class="callout gold">
+    <div class="callout-title">★ Revenue Target</div>
+    <p>60-90 sales × $1,997 = <strong>$120K-$180K</strong>. Last year: 40 sales / 335 = 11.94% at $1,597. This year: more English speakers, no Peng Joon competition, hotter topic. Realistic upside is 15-20%.</p>
+  </div>
+
+  <div class="page-footer">
+    <span><span class="brand">10X With AI</span> · GBI Singapore 2026</span>
+    <span>Part 1 / 4 · Overview · Page 1</span>
+  </div>
+</div>
+
+<!-- ========================== PAGE 2 ========================== -->
+<div class="page">
+
+  <span class="doc-tag">Part 1 · The Strategy</span>
+
+  <h1>Why 3 Days Beats a Single-Shot Pitch</h1>
+
+  <div class="subtitle">A 1-day pitch forces the room to decide before they trust you. A 3-day arc lets the room prime itself.</div>
+
+  <h3>Day 1 — Pure value, zero sales pressure</h3>
+  <p>They like you. They tell their friends at lunch about your demo. The room <strong>primes itself</strong>. No CTA, no order forms, no pressure. Open the stack at the end. Leave them leaning forward.</p>
+
+  <h3>Day 2 last slot — The full pitch</h3>
+  <p>By the time you're up, they've sat through Brunson-style pitches from 4-5 other speakers. You're the one they came for. The close lands soft <strong>because the trust is already there</strong>.</p>
+
+  <h3>Day 3 breakout — Second touch</h3>
+  <p>Fence-sitters from Day 2 (everyone who said "let me think about it") get a second touch. Buyers get deepening. Both groups leave warm for Day 4.</p>
+
+  <h3>Day 4 repeat — Last shot</h3>
+  <p>Mac bundles. Anyone who walked Day 2/3 gets a bigger frame. <strong>Three rooms to convert. Not one.</strong></p>
+
+  <div class="divider"></div>
+
+  <h2>The Audience You're Selling To</h2>
+
+  <p>This room is a hybrid: GBI veterans (operators, want tactical implementation, run on math) plus MMI graduates (already conditioned to declarations and identity-shifts).</p>
+
+  <table>
+    <tr>
+      <th>Audience trait</th>
+      <th>What it means for your design</th>
+    </tr>
+    <tr>
+      <td class="label">MMI conditioned</td>
+      <td>Use Eker mechanics — declarations, identity locks, "rich vs. poor" reframes</td>
+    </tr>
+    <tr>
+      <td class="label">GBI tactical</td>
+      <td>Show ROI math. Hard numbers. "Pays for itself in 15 days."</td>
+    </tr>
+    <tr>
+      <td class="label">Asia-mixed</td>
+      <td>Mandarin track in cohort. Local case studies (Singapore / KL / Jakarta)</td>
+    </tr>
+    <tr>
+      <td class="label">Multi-speaker fatigue</td>
+      <td>Show layer is non-negotiable. State engineering at every block</td>
+    </tr>
+    <tr>
+      <td class="label">Pre-buying conditioned</td>
+      <td>Already familiar with stage closes — your close needs MORE differentiation, not less</td>
+    </tr>
+  </table>
+
+  <div class="callout gold">
+    <div class="callout-title">★ The Single Most Important Sentence</div>
+    <p>By the time the $1,997 number hits the slide on Day 2, the audience has declared <strong>three times out loud</strong> that they're the kind of person who builds systems that work for them. Saying no becomes inconsistent with who they've publicly been for two days.</p>
+    <p><em>That is the whole game. Everything else is choreography.</em></p>
+  </div>
+
+  <div class="page-footer">
+    <span><span class="brand">10X With AI</span> · GBI Singapore 2026</span>
+    <span>Part 1 / 4 · Strategy · Page 2</span>
+  </div>
+</div>
+
+<!-- ========================== PAGE 3 ========================== -->
+<div class="page">
+
+  <span class="doc-tag">Part 1 · Cross-Cutting Elements</span>
+
+  <h1>The Hooks That Run Across All 3 Days</h1>
+
+  <div class="subtitle">These are the show layer. Plant Day 1 minute 12. Fire across all 3 days. By Day 3 they're tribal.</div>
+
+  <h2>The Streisand Hook · Mission: Impossible Theme</h2>
+  <p>30-second clip plays before <strong>every demo</strong>, every time, identical. By Day 3, the room cheers at the first four notes. They leave humming it. They hum it Tuesday morning when they sit down to build their first AI. <em>That's the trigger that makes them buy.</em></p>
+
+  <h2>The Anchor Word · "Tuesday"</h2>
+  <p>Plant in Day 1, minute 12. <em>"Last Tuesday I deployed three AI employees in 90 minutes."</em> Drop it every time you describe the post-cohort future. By Day 3, just saying "Tuesday" lands a moment.</p>
+
+  <h2>The Catchphrase · "Who Builds The AI?" → "I DO!"</h2>
+  <p>Plant in Day 1, minute 14. Trigger every transition. <strong>12+ times across 3 days.</strong> By Day 3 it's tribal — the room shouts before you even ask.</p>
+
+  <blockquote>
+    <strong>You:</strong> "Who builds the AI?"<br>
+    <strong>Room:</strong> "I DO!"<br>
+    <strong>You:</strong> "Louder. WHO BUILDS THE AI?"<br>
+    <strong>Room:</strong> "I DO!"
+  </blockquote>
+
+  <h2>The Physical Anchor</h2>
+  <p>Open hand to chest. Fire on every "yes" moment. By Day 2's close, the gesture alone moves the room. Eker mechanic at industrial scale.</p>
+
+  <h2>The Wealth Reframe (MMI Hook)</h2>
+
+  <blockquote>
+    Poor people hire. Rich people deploy.
+  </blockquote>
+
+  <p>Fire on Day 1 minute 20, Day 2 minute 5, Day 2 close, Day 3 open. The MMI veterans in the room (Eker conditioning) react. The line plants the offer's worldview without selling.</p>
+
+  <div class="page-footer">
+    <span><span class="brand">10X With AI</span> · GBI Singapore 2026</span>
+    <span>Part 1 / 4 · Cross-Cutting · Page 3</span>
+  </div>
+</div>
+
+<!-- ========================== PAGE 4 ========================== -->
+<div class="page">
+
+  <span class="doc-tag">Part 1 · Music &amp; State</span>
+
+  <h1>Music Cue Library</h1>
+
+  <div class="subtitle">Every cue maps to a state. State maps to a sale.</div>
+
+  <table>
+    <tr>
+      <th>Moment</th>
+      <th>Track Recommendation</th>
+      <th style="width:14%">Length</th>
+    </tr>
+    <tr>
+      <td class="label">Walk-on (every day, identical)</td>
+      <td>"Lose Yourself" / "Power" / "Eye of the Tiger" — pick ONE, never change</td>
+      <td>30s</td>
+    </tr>
+    <tr>
+      <td class="label">Demo drop (every demo, identical)</td>
+      <td><strong style="color:#fbbf24">Mission: Impossible Theme</strong> (5/4 time signature)</td>
+      <td>30s</td>
+    </tr>
+    <tr>
+      <td class="label">Stack reveal (D2 close)</td>
+      <td>Hans Zimmer "Time" / "Heart of Courage" (Two Steps From Hell)</td>
+      <td>90s</td>
+    </tr>
+    <tr>
+      <td class="label">Decision moment (D2 + D3 close)</td>
+      <td>"In the Hall of the Mountain King" / Stranger Things theme</td>
+      <td>30s</td>
+    </tr>
+    <tr>
+      <td class="label">Dance break (D2 min 30)</td>
+      <td>"Don't Stop Me Now" / "Uptown Funk"</td>
+      <td>60s</td>
+    </tr>
+    <tr>
+      <td class="label">Reflection bed (valleys, anchor moments)</td>
+      <td>Hans Zimmer "Time" (quiet) / Einaudi "Experience"</td>
+      <td>90s</td>
+    </tr>
+    <tr>
+      <td class="label">Exit / tribe (every break)</td>
+      <td>"September" (EWF) / "Don't Stop Believin'" — pick ONE</td>
+      <td>90s</td>
+    </tr>
+    <tr>
+      <td class="label">Pre-close emotional reset</td>
+      <td>"Hallelujah" (instrumental)</td>
+      <td>60s</td>
+    </tr>
+  </table>
+
+  <h2>State Engineering Rules</h2>
+
+  <ul>
+    <li><strong>Stand every 15-20 minutes.</strong> Non-negotiable for an Asia 4-hour audience.</li>
+    <li><strong>Power breath × 5</strong> at every block opener. Resets the room in 30 seconds.</li>
+    <li><strong>Pattern interrupt every 12 minutes.</strong> Sound, movement, callback, music — never teach &gt;12 min flat.</li>
+    <li><strong>Pick 3-5 barometer audience members</strong> in first 5 min of Day 1. Read by them.</li>
+    <li><strong>Fire physical anchor</strong> on every peak yes-moment. By Day 2's close, the gesture itself triggers the state.</li>
+  </ul>
+
+  <h2>Activity Density</h2>
+
+  <p>One activity every <strong>7-10 minutes minimum</strong>. Never teach &gt; 12 minutes in a flat block. The fix for "you teach too much" isn't less content — it's more <em>changes</em>.</p>
+
+  <div class="page-footer">
+    <span><span class="brand">10X With AI</span> · GBI Singapore 2026</span>
+    <span>Part 1 / 4 · Music · Page 4</span>
+  </div>
+</div>
+
+<!-- ========================== PAGE 5 ========================== -->
+<div class="page">
+
+  <span class="doc-tag">Part 1 · Energy Curve</span>
+
+  <h1>The Energy Curve Across All 3 Days</h1>
+
+  <div class="subtitle">You cannot live in peak state. Peaks need valleys. The close lands on a peak because the valley right before it is engineered.</div>
+
+  <div class="energy-block">Energy
+  ▲
+10│         ★(D1 demo)         ★(D2 demos × 2)        ★(D3 social proof)
+ 9│        ╱            ╲     ╱  peak  ╲           ╱
+ 8│  ★    ╱              ╲   ╱          ★(close) ╱
+ 7│ ╱ ╲  ╱     valley     ╲ ╱       valley     ╲╱
+ 6│╱   ★(D1 valley)        ★(D2 valley)         ★(D3 close)
+ 5│
+  └────────────────────────────────────────────────────────▶
+  Day 1 (75 min)        Day 2 (90 min)        Day 3 (60 min)</div>
+
+  <p><strong>Day 1 builds.</strong> Day 2 peaks at the close. Day 3 lands soft on social proof + deadline.</p>
+
+  <h2>The Lethal Slumps (and the Counter)</h2>
+
+  <table>
+    <tr>
+      <th>Slump</th>
+      <th>When</th>
+      <th>Counter Move</th>
+    </tr>
+    <tr>
+      <td class="label">D1 mid-content fade</td>
+      <td>~min 50</td>
+      <td>Stand-up + partner share (SE-6 TTN)</td>
+    </tr>
+    <tr>
+      <td class="label">D2 post-lunch dip</td>
+      <td>~min 30</td>
+      <td>Dance break + most ambitious demo (Sales AI)</td>
+    </tr>
+    <tr>
+      <td class="label">D2 pre-close fatigue</td>
+      <td>~min 65</td>
+      <td>Engineered valley → Ops AI (peak 2) → close ramp</td>
+    </tr>
+    <tr>
+      <td class="label">D3 fence-sitter exhaustion</td>
+      <td>~min 30</td>
+      <td>Social proof of buyers + live Q&amp;A (active mode)</td>
+    </tr>
+  </table>
+
+  <h2>Pre-Stage Routine (Universal · 60 min before every slot)</h2>
+
+  <ol>
+    <li><strong>2 min power breathing</strong> — short fast nasal inhale, forceful mouth exhale, ~30 reps</li>
+    <li><strong>Power pose × 60s</strong> — V-shape arms, alone in green room or empty corner</li>
+    <li><strong>Recite opening 60 seconds out loud</strong> — not in your head. Out loud.</li>
+    <li><strong>Entrance anthem on earbud</strong> — same song every time, low volume</li>
+    <li><strong>Fire physical anchor</strong> at peak energy. Lock the state in.</li>
+    <li><strong>Final ritual line</strong> — yours: <em>"I'm here for them."</em></li>
+  </ol>
+
+  <div class="callout">
+    <div class="callout-title">Tech Contingency — Read Daily</div>
+    <p><strong>1.</strong> Backup recording of every demo, ONE keystroke away. AV operator's only job during demos.</p>
+    <p><strong>2.</strong> Cellular hotspot on standby. Personal hotspot, fully charged, as WiFi failover. Test Tuesday morning.</p>
+    <p><strong>3.</strong> Failure recovery scripts taped to lectern. Lines for: WiFi dies, volunteer freezes, AI generates weird output, joke flops, you forget your place, full stack down, heckler.</p>
+  </div>
+
+  <div class="page-footer">
+    <span><span class="brand">10X With AI</span> · GBI Singapore 2026</span>
+    <span>Part 1 / 4 · Energy · Page 5</span>
+  </div>
+</div>
+
+<!-- ========================== PAGE 6 ========================== -->
+<div class="page">
+
+  <span class="doc-tag">Part 1 · What's Next</span>
+
+  <h1>Coming In Parts 2, 3 &amp; 4</h1>
+
+  <div class="subtitle">Each day gets its own minute-by-minute run sheet, slide cues, music triggers, and coordinator's checklist.</div>
+
+  <table>
+    <tr>
+      <th style="width:14%">Part</th>
+      <th>Document</th>
+      <th>Contains</th>
+    </tr>
+    <tr>
+      <td class="label">Part 2</td>
+      <td><strong style="color:#ec4357">Day 1 — The Reveal</strong></td>
+      <td>75-min run sheet · Open hot · Identity · Marketing AI demo · Day 2 hook</td>
+    </tr>
+    <tr>
+      <td class="label">Part 3</td>
+      <td><strong style="color:#ec4357">Day 2 — The Close</strong></td>
+      <td>90-min run sheet · Sales AI demo · Ops AI showstopper · Full 22-min close script</td>
+    </tr>
+    <tr>
+      <td class="label">Part 4</td>
+      <td><strong style="color:#ec4357">Day 3 — The Re-pitch</strong></td>
+      <td>60-min run sheet · Social proof · Live Q&amp;A · Soft re-pitch · Day 4 hook · Crew brief</td>
+    </tr>
+  </table>
+
+  <div class="divider"></div>
+
+  <h2>Already Built (in this folder)</h2>
+
+  <table>
+    <tr>
+      <th>File</th>
+      <th>Purpose</th>
+    </tr>
+    <tr>
+      <td><code>10X_WITH_AI_OFFER.pdf</code></td>
+      <td>Print-ready offer one-pager (1.46 MB, A4)</td>
+    </tr>
+    <tr>
+      <td><code>AI_EMPIRE_OFFER.html</code></td>
+      <td>Editable source for the offer one-pager</td>
+    </tr>
+    <tr>
+      <td><code>CLOSE_SCRIPT.md</code></td>
+      <td>Full 22-min Day 2 close + 12-objection bank</td>
+    </tr>
+    <tr>
+      <td><code>LIVE_DEMOS.md</code></td>
+      <td>Marketing AI / Sales AI / Ops AI demo choreographies</td>
+    </tr>
+    <tr>
+      <td><code>BONUSES.md</code></td>
+      <td>The 11-item stack with $-anchors + Founder OS detail</td>
+    </tr>
+    <tr>
+      <td><code>OFFER_SCORECARD.md</code></td>
+      <td>10-criterion offer rating methodology (current: 9.3/10)</td>
+    </tr>
+    <tr>
+      <td><code>GBI_PRESENTATION_3DAY.md</code></td>
+      <td>Master plan in markdown (this is the source for Parts 1-4)</td>
+    </tr>
+  </table>
+
+  <div class="divider"></div>
+
+  <div class="callout gold">
+    <div class="callout-title">★ Tell me to continue</div>
+    <p>Reply <em>"continue"</em> or <em>"Day 1"</em> and I'll build <strong>Part 2 — Day 1 Run Sheet</strong> in the same styled HTML + PDF treatment.</p>
+    <p>Or tell me to swap any element of this overview before we proceed.</p>
+  </div>
+
+  <div class="page-footer">
+    <span><span class="brand">10X With AI</span> · GBI Singapore 2026</span>
+    <span>Part 1 / 4 · End · Page 6</span>
+  </div>
+</div>
+
+</body>
+</html>

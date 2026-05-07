@@ -1,0 +1,106 @@
+@import "tailwindcss";
+
+:root {
+  --bg-deep: #071512;
+  --bg-elevated: #0d1f1a;
+  --surface: rgba(18, 42, 36, 0.55);
+  --border: rgba(201, 162, 39, 0.22);
+  --gold: #d4af37;
+  --gold-dim: #9a7b2e;
+  --mint: #7eb8a8;
+  --text: #e8f0ec;
+  --text-muted: #8aa399;
+  --danger: #c94a4a;
+}
+
+@theme inline {
+  --color-background: var(--bg-deep);
+  --color-foreground: var(--text);
+  --font-sans: var(--font-body);
+  --font-display: var(--font-display);
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes shimmer-line {
+  0% {
+    background-position: 0% 50%;
+  }
+  100% {
+    background-position: 100% 50%;
+  }
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: var(--bg-deep);
+  color: var(--text);
+  font-family: var(--font-body), system-ui, sans-serif;
+}
+
+.font-display {
+  font-family: var(--font-display), system-ui, sans-serif;
+}
+
+.mesh-bg {
+  background-color: var(--bg-deep);
+  background-image:
+    radial-gradient(ellipse 120% 80% at 10% -20%, rgba(30, 90, 72, 0.45), transparent 55%),
+    radial-gradient(ellipse 90% 60% at 95% 10%, rgba(201, 162, 39, 0.12), transparent 50%),
+    radial-gradient(ellipse 70% 50% at 50% 100%, rgba(14, 55, 48, 0.5), transparent 60%);
+}
+
+.grain {
+  position: relative;
+}
+
+.grain::after {
+  content: "";
+  pointer-events: none;
+  position: fixed;
+  inset: 0;
+  opacity: 0.04;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  z-index: 1;
+}
+
+.reveal {
+  animation: rise 0.85s ease-out both;
+}
+
+.reveal-delay-1 {
+  animation-delay: 0.12s;
+}
+.reveal-delay-2 {
+  animation-delay: 0.22s;
+}
+.reveal-delay-3 {
+  animation-delay: 0.34s;
+}
+
+.accent-line {
+  height: 2px;
+  width: 100%;
+  max-width: 8rem;
+  background: linear-gradient(
+    90deg,
+    var(--gold-dim),
+    var(--gold),
+    var(--mint),
+    var(--gold)
+  );
+  background-size: 200% 100%;
+  animation: shimmer-line 8s ease-in-out infinite;
+}
