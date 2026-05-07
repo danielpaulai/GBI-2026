@@ -49,9 +49,23 @@ curl -N -X POST http://localhost:8000/api/run \
 
 Expect JSON `update` lines (CEO → handoff → department) then `{"done": true}`.
 
+## Git (standalone repo)
+
+This folder is its **own** Git repository. Open **`jarvis-stage`** in Cursor (File → Open Folder) so Source Control and Push apply only to Jarvis.
+
+Create an empty repo on GitHub, then:
+
+```bash
+cd /path/to/jarvis-stage
+git remote add origin https://github.com/YOUR_USER/YOUR_REPO.git
+git push -u origin main
+```
+
+If this directory still lives inside another project, that parent may list `jarvis-stage/` in `.gitignore` so only this repo tracks the code.
+
 ## Project rules
 
-Copy `cursor-package/.cursorrules` into this folder as **`.cursorrules`** (already mirrored at repo root when you sync from the package). Cursor loads it for stack lock and stage rules.
+**`.cursorrules`** in this folder is the stack lock for Cursor. If you sync from `cursor-package`, overwrite from there when the package updates.
 
 ## Security note
 
