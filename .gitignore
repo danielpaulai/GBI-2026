@@ -29,5 +29,5 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
-# Standalone repo (push Jarvis only from jarvis-stage/)
+# Jarvis app: separate Git repo (see README — workshop repo stays independent)
 jarvis-stage/

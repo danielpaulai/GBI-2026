@@ -24,6 +24,19 @@
 
 ---
 
+## Jarvis (separate app repo)
+
+This repository is the **workshop and stage package** (run sheets, close, demos, crew briefs, research). It should stay easy to read, print, and rehearse without worrying about app dependencies or deploys.
+
+The **10X Command Center / Jarvis** build (Next.js, FastAPI, LangGraph) lives in a **different Git repository**. That way:
+
+- Workshop and offer edits here never block or entangle Jarvis releases.
+- Jarvis engineers can ship the app on its own cadence without tripping over stage PDFs and scripts.
+
+If you keep a local `jarvis-stage/` folder inside this project for convenience, it is **gitignored** here so it is not committed twice. Clone or init Jarvis separately, open that folder in Cursor, and push **only** the Jarvis remote for app changes.
+
+---
+
 ## Suggested reading order
 
 1. `STRATEGY.md` — get the whole picture in 15 min.
