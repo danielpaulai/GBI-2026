@@ -51,9 +51,11 @@ Expect JSON `update` lines (CEO → handoff → department) then `{"done": true}
 
 ## Git (standalone repo)
 
-This folder is its **own** Git repository. Open **`jarvis-stage`** in Cursor (File → Open Folder) so Source Control and Push apply only to Jarvis.
+This folder is its **own** Git repository — the **app**, not the workshop binder. Open **`jarvis-stage`** in Cursor (File → Open Folder) so Source Control and Push apply only to Jarvis.
 
-Create an empty repo on GitHub, then:
+The GBI / workshop package (run sheets, offer, research) can live in a **separate GitHub repo** beside this one. That is intentional: stage copy and PDFs do not affect your dependency graph, CI, or deploys here, and Jarvis changes do not clutter the workshop repo.
+
+Create an empty repo on GitHub for Jarvis, then:
 
 ```bash
 cd /path/to/jarvis-stage
@@ -61,7 +63,7 @@ git remote add origin https://github.com/YOUR_USER/YOUR_REPO.git
 git push -u origin main
 ```
 
-If this directory still lives inside another project, that parent may list `jarvis-stage/` in `.gitignore` so only this repo tracks the code.
+If this directory sits inside the workshop folder on disk, the parent repo should **ignore** `jarvis-stage/` so you are not tracking the same code twice — push workshop from the parent remote, push Jarvis from here.
 
 ## Project rules
 
