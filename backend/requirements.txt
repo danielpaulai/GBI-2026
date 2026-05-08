@@ -4,4 +4,5 @@ python-dotenv==1.0.1
 langgraph>=0.2.0
 langgraph-supervisor>=0.0.31
 langchain-anthropic>=0.3.13
+langchain-openai>=0.3.0
 langchain-core>=0.3.0

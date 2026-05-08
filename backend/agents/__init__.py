@@ -1,5 +1,43 @@
-from agents.marketing import build_marketing_agent
+from agents.marketing import (
+	build_analytics_agent,
+	build_brand_voice_agent,
+	build_campaigns_agent,
+	build_competitor_intel_agent,
+	build_content_agent,
+	build_creative_review_agent,
+	build_cro_funnel_agent,
+	build_email_writer_agent,
+	build_email_sequence_agent,
+	build_facebook_creator_agent,
+	build_instagram_creator_agent,
+	build_landing_page_agent,
+	build_linkedin_creator_agent,
+	build_market_research_agent,
+	build_newsletter_writer_agent,
+	build_offers_agent,
+	build_tiktok_creator_agent,
+)
 from agents.operations import build_operations_agent
 from agents.sales import build_sales_agent
 
-__all__ = ["build_marketing_agent", "build_operations_agent", "build_sales_agent"]
+__all__ = [
+	"build_analytics_agent",
+	"build_brand_voice_agent",
+	"build_campaigns_agent",
+	"build_competitor_intel_agent",
+	"build_content_agent",
+	"build_creative_review_agent",
+	"build_cro_funnel_agent",
+	"build_email_writer_agent",
+	"build_email_sequence_agent",
+	"build_facebook_creator_agent",
+	"build_instagram_creator_agent",
+	"build_landing_page_agent",
+	"build_linkedin_creator_agent",
+	"build_market_research_agent",
+	"build_newsletter_writer_agent",
+	"build_offers_agent",
+	"build_tiktok_creator_agent",
+	"build_operations_agent",
+	"build_sales_agent",
+]
