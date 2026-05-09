@@ -1,6 +1,7 @@
 import json
 import logging
 import os
+import asyncio
 from collections.abc import AsyncIterator
 from typing import Any
 
@@ -21,6 +22,7 @@ from jarvis_graph import (
     create_chat_model,
     get_jarvis_app,
     get_model_candidates,
+    load_brand_dna,
     plan_route,
     provider_payload,
     remember_working_model,
@@ -28,6 +30,7 @@ from jarvis_graph import (
     serialize_update_payload,
 )
 from executive_knowledge import executive_knowledge_context
+from lib.quality_loop import run_quality_loop
 from specialist_specs import SPECIALIST_SPECS, executive_key_for_department, format_output, schema_contract
 
 load_dotenv()
@@ -46,6 +49,23 @@ SPECIALIST_BUILDERS = {
     **MARKETING_AGENT_BUILDERS,
     "sales": build_sales_agent,
     "operations": build_operations_agent,
+}
+
+# Content-producing agents that run through the 3-draft quality loop.
+# Maps agent_key → creative_review content_type rubric.
+QUALITY_LOOP_AGENTS: dict[str, str] = {
+    "content":                "linkedin_text_post",
+    "brand_voice":            "linkedin_text_post",
+    "linkedin_creator":       "linkedin_text_post",
+    "instagram_creator":      "instagram",
+    "tiktok_creator":         "instagram",
+    "facebook_creator":       "instagram",
+    "newsletter_writer":      "newsletter",
+    "email_writer":           "newsletter",
+    "email_sequence":         "newsletter",
+    "blog_writer":            "blog_post",
+    "landing_page":           "landing_page",
+    "landing_page_architect": "landing_page",
 }
 
 if os.getenv("LANGCHAIN_TRACING_V2", "").lower() in ("1", "true", "yes") and not os.getenv(
@@ -219,7 +239,38 @@ async def _run_specialist(agent_key: str, intent: str, route_payload: dict[str, 
     spec = SPECIALIST_SPECS[agent_key]
     prompt = _build_spec_prompt(intent, route_payload, findings, agent_key)
 
-    if spec.builder_name and spec.builder_name in SPECIALIST_BUILDERS:
+    if spec.builder_name and spec.builder_name in SPECIALIST_BUILDERS and agent_key in QUALITY_LOOP_AGENTS:
+        # Content-producing agent: 3 parallel drafts → judge → revise (max 2x)
+        content_type = QUALITY_LOOP_AGENTS[agent_key]
+        brand_dna = load_brand_dna()
+        specialist = SPECIALIST_BUILDERS[spec.builder_name](worker)
+
+        def _invoke_fn(task: str, temperature: float = 0.8, **_) -> str:
+            result = specialist.invoke({"messages": [HumanMessage(content=task)]})
+            return _extract_last_ai_text(result).strip() or task
+
+        loop_result = await asyncio.get_event_loop().run_in_executor(
+            None,
+            lambda: run_quality_loop(
+                _invoke_fn,
+                prompt,
+                content_type,
+                brand_dna=brand_dna,
+                brand_name=brand_dna.get("owner", "the user"),
+            ),
+        )
+        raw_text = loop_result["output"]
+        quality_note = (
+            f"quality_loop: {loop_result['status']} | "
+            f"score={loop_result['metadata'].get('weighted_total', '?'):.2f} | "
+            f"revisions={loop_result['revisions_made']}"
+        )
+        if not raw_text:
+            raw_text = f"{agent_key} returned no structured output."
+        text, valid, validation_detail = await _validate_specialist_output(agent_key, raw_text, worker)
+        return text, valid, f"{quality_note} | {validation_detail}"
+
+    elif spec.builder_name and spec.builder_name in SPECIALIST_BUILDERS:
         specialist = SPECIALIST_BUILDERS[spec.builder_name](worker)
         result = await specialist.ainvoke({"messages": [HumanMessage(content=prompt)]})
         raw_text = _extract_last_ai_text(result).strip()

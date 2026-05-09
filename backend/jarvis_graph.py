@@ -45,6 +45,7 @@ from agents import (
     build_tiktok_creator_agent,
 )
 from agents._prompts import load_prompt
+from lib.quality_loop import make_quality_loop_node
 
 DepartmentKey = Literal["marketing", "sales", "operations", "finance", "general"]
 ExecutionMode = Literal["single", "swarm"]
@@ -519,6 +520,24 @@ MARKETING_AGENT_BUILDERS = {
     "creative_review": build_creative_review_agent,
 }
 
+# Quality-loop-wrapped builders for content-producing specialists.
+# Each specialist runs 3 parallel drafts → judge → revise (max 2x) before output ships.
+# Used by _run_specialist in main.py for content agents.
+MARKETING_AGENT_BUILDERS_WITH_QUALITY = {
+    "content":              make_quality_loop_node("content",              build_content_agent,           "linkedin_text_post"),
+    "brand_voice":          make_quality_loop_node("brand_voice",          build_brand_voice_agent,       "linkedin_text_post"),
+    "linkedin_creator":     make_quality_loop_node("linkedin_creator",     build_linkedin_creator_agent,  "linkedin_text_post"),
+    "instagram_creator":    make_quality_loop_node("instagram_creator",    build_instagram_creator_agent, "instagram"),
+    "tiktok_creator":       make_quality_loop_node("tiktok_creator",       build_tiktok_creator_agent,    "instagram"),
+    "facebook_creator":     make_quality_loop_node("facebook_creator",     build_facebook_creator_agent,  "instagram"),
+    "newsletter_writer":    make_quality_loop_node("newsletter_writer",    build_newsletter_writer_agent, "newsletter"),
+    "email_writer":         make_quality_loop_node("email_writer",         build_email_writer_agent,      "newsletter"),
+    "email_sequence":       make_quality_loop_node("email_sequence",       build_email_sequence_agent,    "newsletter"),
+    "blog_writer":          make_quality_loop_node("blog_writer",          build_blog_writer_agent,       "blog_post"),
+    "landing_page":         make_quality_loop_node("landing_page",         build_landing_page_agent,      "landing_page"),
+    "landing_page_architect": make_quality_loop_node("landing_page_architect", build_landing_page_architect_agent, "landing_page"),
+}
+
 PROJECT_TEMPLATES: tuple[ProjectTemplate, ...] = (
     ProjectTemplate(
         key="landing_page_system",
@@ -631,6 +650,17 @@ PROJECT_TEMPLATES: tuple[ProjectTemplate, ...] = (
 
 DEFAULT_ANTHROPIC_MODEL = "claude-3-7-sonnet-20250219"
 DEFAULT_OPENAI_MODEL = "gpt-4.1-mini"
+
+
+def load_brand_dna() -> dict:
+    """Load brand identity from data/brand.json. Returns empty dict on failure."""
+    import json
+    import pathlib
+    brand_path = pathlib.Path(__file__).parent / "data" / "brand.json"
+    try:
+        return json.loads(brand_path.read_text())
+    except Exception:  # noqa: BLE001
+        return {}
 FALLBACK_ANTHROPIC_MODELS: tuple[str, ...] = (
     "claude-3-7-sonnet-20250219",
     "claude-3-5-sonnet-20241022",
