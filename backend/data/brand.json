@@ -1,5 +1,5 @@
 {
-  "_comment": "Single source of truth for Jarvis brand identity. Read by every agent + Satori cards.",
+  "_comment": "Single source of truth for Jarvis brand identity. Read by every agent + Satori cards. The /jarvis prototype reads palette + voice from here so the developer sees one canonical schema.",
 
   "brand": "Purely Personal",
   "owner": "Daniel Paul",
@@ -8,15 +8,17 @@
     "primary": "#ec4357",
     "primary_alt": "#d92e44",
     "background": "#0a0204",
+    "background_elevated": "#150608",
     "accent_gold": "#fbbf24",
+    "accent_cyan": "#00d4ff",
     "text_primary": "#ffffff",
     "text_muted": "#c8c8c8",
-    "border": "#2a3848"
+    "border": "rgba(236, 67, 87, 0.25)"
   },
 
   "typography": {
-    "display": "Space Grotesk",
-    "body": "Inter",
+    "display": "Syne",
+    "body": "Manrope",
     "mono": "JetBrains Mono"
   },
 
@@ -146,5 +148,47 @@
     "min_performance_multiplier": 2.0,
     "examples_per_judgment": 5,
     "platforms": ["linkedin", "instagram", "tiktok", "youtube"]
-  }
+  },
+
+  "categories": [
+    { "id": "social",   "label": "Social Media",    "icon": "share",     "count_field": "queued_posts" },
+    { "id": "email",    "label": "Email Campaigns", "icon": "mail",      "count_field": "drafts" },
+    { "id": "longform", "label": "Long-form",       "icon": "doc",       "count_field": "drafts" },
+    { "id": "images",   "label": "Images & Cards",  "icon": "image",     "count_field": "rendered" },
+    { "id": "video",    "label": "Video & Reels",   "icon": "film",      "count_field": "rendered" },
+    { "id": "pages",    "label": "Pages & Funnels", "icon": "layout",    "count_field": "live" },
+    { "id": "outreach", "label": "Outreach",        "icon": "send",      "count_field": "in_flight" },
+    { "id": "forms",    "label": "Forms & Capture", "icon": "clipboard", "count_field": "live" }
+  ],
+
+  "wings": [
+    {
+      "id": "cmo",
+      "label": "CMO",
+      "title": "Chief Marketing Officer",
+      "color": "primary",
+      "specialists": ["LinkedIn writer", "Newsletter writer", "Blog writer", "Image director", "Outlier detector"]
+    },
+    {
+      "id": "cro",
+      "label": "CRO",
+      "title": "Chief Revenue Officer",
+      "color": "accent_cyan",
+      "specialists": ["Outreach drafter", "Pipeline analyst", "Call brief generator"]
+    },
+    {
+      "id": "coo",
+      "label": "COO",
+      "title": "Chief Operating Officer",
+      "color": "accent_gold",
+      "specialists": ["Task router", "SOP author", "Calendar guard"]
+    },
+    {
+      "id": "cfo",
+      "label": "CFO",
+      "title": "Chief Financial Officer",
+      "color": "primary_alt",
+      "specialists": ["Cashflow watcher", "Receipt parser", "Quarterly synth"]
+    }
+  ]
 }
