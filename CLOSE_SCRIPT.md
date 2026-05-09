@@ -152,9 +152,9 @@ The 5 ifs. Spoken slowly. Eye contact across the room.
 
 [Pause.]
 
-> **"For the people in this room — today — $1,497."**
+> **"For the people in this room — today — $1,997."**
 
-[Slide: **$1,497**. Music PEAKS on the number. Music holds, doesn't fade.]
+[Slide: **$1,997**. Music PEAKS on the number. Music holds, doesn't fade.]
 
 [**HOLD THE NUMBER ON SLIDE FOR 5 FULL SECONDS WITHOUT TALKING.** This is the most important silence of the entire 4 hours.]
 
@@ -164,7 +164,7 @@ The 5 ifs. Spoken slowly. Eye contact across the room.
 
 ### Emotional close (50% buy here)
 
-> **"This isn't about $1,497. This is about who you are now."**
+> **"This isn't about $1,997. This is about who you are now."**
 
 > **"For the last two days you've been telling this room — telling yourselves — that you're the kind of person who builds systems that work for them. You said it with your hand on your heart. You said it standing up. You said it like you meant it."**
 
@@ -174,13 +174,13 @@ The 5 ifs. Spoken slowly. Eye contact across the room.
 
 ### Logical close (30% buy here)
 
-> **"Let's talk math. $1,497 over 12 months is four dollars a day. Four dollars."**
+> **"Let's talk math. $1,997 over 12 months is four dollars a day. Four dollars."**
 
 > **"You spend more on a coffee."**
 
 > **"Now compare. ONE Marketing AI replaces a $1,500-a-month freelance copywriter. ONE Sales AI replaces a $4,000-a-month VA. ONE Ops AI saves you the cost of a $400-a-month reporting consultant."**
 
-> **"You're paying $1,497 once. You're getting back five-figures of work every month. Forever."**
+> **"You're paying $1,997 once. You're getting back five-figures of work every month. Forever."**
 
 ---
 
@@ -274,13 +274,13 @@ These are the responses to the 12 most common objections you'll hear during and 
 
 ---
 
-### O-3. "$1,497 is too much / I don't have the money."
+### O-3. "$1,997 is too much / I don't have the money."
 
 > "I hear you. Let me ask — what would have to be true financially for this to be a yes for you?"
 
 (Surface the real number.)
 
-> "Because here's the math. $1,497 over 12 months is $4 a day. If your business doesn't generate $4 of new value a day from one AI employee in a year — I'd actually want to know about it. Because that's a deeper conversation than this cohort can solve. But the cohort exists to make sure that doesn't happen."
+> "Because here's the math. $1,997 over 12 months is $4 a day. If your business doesn't generate $4 of new value a day from one AI employee in a year — I'd actually want to know about it. Because that's a deeper conversation than this cohort can solve. But the cohort exists to make sure that doesn't happen."
 
 > "And if it's a cash-flow issue — we have a 3-pay option. $549 today, $549 in 30 days, $549 in 60 days. That's 18 dollars a day for the first 90 days, then nothing."
 
@@ -310,7 +310,7 @@ These are the responses to the 12 most common objections you'll hear during and 
 
 > "That's a real option. Some people do. And some of those people are still trying to figure it out two years later. Here's the question — what's the COST of doing it yourself? Six months of evenings? A year of false starts?"
 
-> "$1,497 buys you 19 hours of my time, 20 templates I've already built, and a community of people doing it with you. The cost-of-time math always wins for people who actually want this done."
+> "$1,997 buys you 19 hours of my time, 20 templates I've already built, and a community of people doing it with you. The cost-of-time math always wins for people who actually want this done."
 
 (Cardone cost-of-inaction frame.)
 
@@ -340,7 +340,7 @@ These are the responses to the 12 most common objections you'll hear during and 
 
 ### O-10. "I'm too busy right now / I don't have the time."
 
-> "I appreciate that. Let me reframe — the entire promise of this cohort is to GIVE YOU back time. The cost of saying no isn't just $1,497 you don't spend. It's also 6 more months of doing the work the AI was supposed to do. What's that worth to you?"
+> "I appreciate that. Let me reframe — the entire promise of this cohort is to GIVE YOU back time. The cost of saying no isn't just $1,997 you don't spend. It's also 6 more months of doing the work the AI was supposed to do. What's that worth to you?"
 
 > "And it's only 19 hours over 4 weeks. Less than 5 hours a week. If you can't carve out 5 hours a week to permanently get back 10 hours a week — we have a deeper conversation to have."
 

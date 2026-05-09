@@ -6,48 +6,57 @@ For the crew helping Danny at GBI Singapore. Read before the event. Reference du
 
 ## What we sell
 
-**The AI Employee Cohort. $1,497. Standalone.**
+**10X With AI. $1,997. Standalone. Standard tier (no VIP tier).**
 
-A 4-week guided cohort (pre-bootcamp + 3 weekends + 3 office hours) where founders build their own Marketing AI, Sales AI, and Ops AI — and deploy them in their actual business — by July 1.
+An SR-managed live cohort (Pre-Bootcamp + 3-Week Bootcamp + 3-Week Live Accelerator + 3-Month Implementation Support) where founders build their AI Employee team — Marketing, Sales, Ops, Finance — and deploy them in their actual business.
 
 ---
 
 ## The 1-breath elevator pitch
 
-> $1,497. 4-week cohort. Build 3 AI employees in your business. Pre-bootcamp June 12. 20 templates. Founder OS for a year. Refund if you don't have one running by July 1.
+> $1,997 today. 12 hours live with Danny. Pre-Bootcamp June 20-21. Bootcamp 27 June, 4 July, 11 July. AI CEO Brain + 4 AI Executives + Founder OS + 100+ skills. Plus 3 months WhatsApp implementation support.
 
 If you can't say this in one breath, rehearse it.
 
 ---
 
-## The dates (memorize)
+## The dates (memorize — all CEST times, EU-managed cohort)
 
-- **Pre-bootcamp:** June 12–13 (2 days)
-- **Weekend 1:** June 14 (5 hrs) — Marketing AI
-- **Live Accelerator #1:** June 18 (1 hr office hours)
-- **Weekend 2:** June 21 (5 hrs) — Sales AI
-- **Live Accelerator #2:** June 25 (1 hr)
-- **Weekend 3:** June 28 (5 hrs) — Ops AI
-- **Live Accelerator #3:** July 1 (1 hr) — demo day
+- **Pre-Bootcamp Intensive:** **20 & 21 June 2026, 1PM – 3PM CEST**
+- **3-Week Bootcamp:** **27 June, 4 July, 11 July 2026, 11AM – 4PM CEST** (12 hours total live with Danny)
+- **3-Week Live Accelerator:** weekly Q&A with Danny across the same 3 weeks
+- **The 10X Accelerator:** 3 months implementation support via WhatsApp + group calls (post-bootcamp)
 
----
+**For Singapore attendees:** CEST is 6 hours behind SGT.
+- Pre-Bootcamp = 7PM – 9PM SGT (evening, after work)
+- Bootcamp Saturdays = 5PM – 10PM SGT
 
-## What's in the stack ($15,488 value · $1,497 today)
-
-1. The cohort itself — 19 hrs live with Danny (**$4,997**)
-2. Founder OS — 12 months of the SaaS (**$2,997**)
-3. 20 AI templates — Claude Business in a Box (**$4,000+**)
-4. Lifetime cohort access — re-attend any future cohort, forever (**$2,997**)
-5. Private cohort community for 90 days post-cohort (**$497**)
-6. Risk reversal — refund + keep everything if no AI running by July 1 (**priceless**)
+This works for Asia — sessions land in their evening, perfect for working operators.
 
 ---
 
-## The risk reversal — say this exactly
+## What's in the stack ($37,964 value · $1,997 today)
 
-> "Show up to all three weekends. If by July 1 you don't have at least one AI employee running and saving you 5+ hours a week — full refund. AND you keep everything. Founder OS. The templates. The replays. All of it."
+1. **Pre-Bootcamp Intensive** — 2 days live, 20-21 June 1-3PM CEST (**$1,997**)
+2. **3-Week Bootcamp** — 12 hrs live, 27 June + 4 July + 11 July (**$4,997**)
+3. **3-Week Live Accelerator** — weekly Q&A (**$2,997**)
+4. **The 10X Accelerator** — 3 months WhatsApp implementation support (**$2,997**)
+5. **AI CEO Brain** (**$2,997**)
+6. **4 AI Executives** — Marketing, Sales, Ops, Finance (**$4,997**)
+7. **Founder OS** — 3 months free access (**$2,997**)
+8. **100+ AI Skills** (**$3,997**)
+9. **AI Content Vault** — 400+ posts + 10 AI tools (**$3,997**)
+10. **Lifetime Access** to all AI tools & code (**$2,497**)
+11. **AI Danny** — 24/7 coach clone (**$1,997**)
+12. **★ Fast Action (first 25):** VIP 1-on-1 with Danny (**$1,997**)
 
-This is the move that closes hesitant buyers. Lead with it when someone says "I'm not sure."
+---
+
+## The Deployment Promise — say this exactly
+
+> "Show up to all 20 hours. You'll walk out with at least one AI agent running in your business. We work until it's deployed. Period."
+
+This is a results commitment, not a money-back guarantee. We don't refund money — we deliver until it works. Lead with this when someone says "I'm not sure it'll work for me."
 
 ---
 
@@ -58,8 +67,8 @@ This is the move that closes hesitant buyers. Lead with it when someone says "I'
 
 (Force specificity. Then address the real one.)
 
-### "$1,497 is a lot."
-> "$1,497 over 12 months is $4 a day. One AI employee replaces a $1,500/month copywriter. The math works after week one."
+### "$1,997 is a lot."
+> "$1,997 over 12 months is $4 a day. One AI employee replaces a $1,500/month copywriter. The math works after week one."
 
 (If cash is real: 3-pay option — $549 today, $549 in 30 days, $549 in 60 days.)
 

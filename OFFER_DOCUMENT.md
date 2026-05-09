@@ -47,7 +47,7 @@ Three weekends. One pre-bootcamp. Three live office hours. By July 1, you have a
 
 ## What's included
 
-This is everything you get for $1,497. Real-world value below each line is what these things actually cost the people who buy them separately.
+This is everything you get for $1,997. Real-world value below each line is what these things actually cost the people who buy them separately.
 
 ### 1 · The 4-Week AI Employee Cohort
 19 hours of live work with me — pre-bootcamp + 3 weekends + 3 office hours.
@@ -94,11 +94,11 @@ Show up to all three weekends. Build with us. **If by July 1 you don't have at l
 | Risk-Reversal Guarantee | priceless |
 | **Total real-world value** | **$15,488+** |
 
-### Today, in this room: **$1,497**
+### Today, in this room: **$1,997**
 
 That's not a discount. That's a different conversation. The price is what it costs to be in the room. The value is what you're walking out with.
 
-**$1,497 ÷ 12 months = $4 a day.**
+**$1,997 ÷ 12 months = $4 a day.**
 
 One Marketing AI replaces a $1,500/month freelance copywriter.
 One Sales AI replaces a $4,000/month outbound VA.
@@ -110,7 +110,7 @@ You spend $4 a day. You get back $5,900 a month of work. Forever.
 
 ## Three ways to pay
 
-**1. Pay-in-Full — $1,497.** The cleanest path. You're done in one payment.
+**1. Pay-in-Full — $1,997.** The cleanest path. You're done in one payment.
 
 **2. Three-Pay — $549 × 3** over 60 days. ($549 today. $549 in 30 days. $549 in 60 days.)
 
@@ -122,7 +122,7 @@ You spend $4 a day. You get back $5,900 a month of work. Forever.
 
 You show up to all three weekends. You build with us. You ship.
 
-If by **July 1, 2026** you do not have at least one AI employee running in your business AND saving you 5+ hours a week — you email us, we send the full $1,497 back, AND you keep:
+If by **July 1, 2026** you do not have at least one AI employee running in your business AND saving you 5+ hours a week — you email us, we send the full $1,997 back, AND you keep:
 
 - Founder OS access (the SaaS — yours)
 - The 20 AI templates (yours)
@@ -184,7 +184,7 @@ You came here for a reason. The reason is this.
 
 ### Walk to the back of the room.
 
-**$1,497 — pay-in-full or 3-pay**
+**$1,997 — pay-in-full or 3-pay**
 **Cohort begins June 12, 2026**
 **100 seats. Until they're gone.**
 

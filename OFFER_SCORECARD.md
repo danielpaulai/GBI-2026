@@ -127,7 +127,7 @@ This is the Eker mechanic — turns a buying decision into an identity-consisten
 
 One specific math callout near the price:
 
-> *"$1,497 once. Replaces a $4,000/mo VA. Pays for itself in 11 days."*
+> *"$1,997 once. Replaces a $4,000/mo VA. Pays for itself in 11 days."*
 
 GBI audience runs on math. This line answers "is it worth it?" before they ask.
 

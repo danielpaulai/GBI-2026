@@ -2,8 +2,8 @@
 
 **Event.** Guerrilla Business Intensive, Singapore, May 14–17, 2026 (Success Resources).
 **Slot.** Day 1: 90 min · Day 2: 120 min (last 60 min = sales close).
-**Offer.** $1,497 standalone — AI Employee Cohort starting June 12, 2026.
-**Audience.** ~200–350 Asia attendees. ~50 Mandarin speakers. Mac follows with counter-offer/bundle.
+**Offer.** **$1,997 standalone** — 10X With AI Cohort starting June 12, 2026. **Standard tier only — no VIP tier. No risk reversal.**
+**Audience.** ~200–350 Asia attendees. ~50 Mandarin speakers (online live translation provided). Mac follows with counter-offer/bundle.
 
 ---
 
@@ -70,11 +70,17 @@ If you keep a local `jarvis-stage/` folder inside this project for convenience, 
 
 ---
 
-## Open decisions still to confirm
+## Locked decisions (May 7)
 
-- [ ] Final bonus list of 20 templates approved (see `BONUSES.md` for draft).
-- [ ] Founder OS access — what tier, how onboarding works, who handles support during cohort.
-- [ ] Risk reversal — the doc proposes "show up to all 3 weekends, no AI employee live + saving 5+ hrs/week → full refund + keep everything." Confirm ops can honor.
-- [ ] VIP vs. Standard — does the cohort offer have a VIP tier, or one price?
-- [ ] Order flow — order forms at the back, online checkout, or both? Crew brief assumes both.
-- [ ] Mandarin live translation in-room (whisper/headset) vs. only the printed brief.
+- [x] **Price: $1,997** standalone (final).
+- [x] **No money-back guarantee.** Selling on value, not refund risk. **BUT we keep The Deployment Promise** — *"Show up to all 20 hours. You'll walk out with at least one AI agent running. We work until it's deployed."* This is a results commitment, not a refund.
+- [x] **Standard tier only.** No VIP tier. One price for everyone in the cohort.
+- [x] **Order flow: paper order forms at back of room + online checkout** (QR on screen). Both available.
+- [x] **Mandarin support: online live translation.** Presentation runs in English. Mandarin attendees access a live-translated stream on their phones via QR code at registration. No in-room headsets needed. `MANDARIN_BRIEF.md` printed handout still given at registration with offer details + the QR code to the translation feed.
+- [x] **Founder OS bonus: 3 months free access** (already locked in `AI_EMPIRE_OFFER.html`).
+
+### Still to confirm pre-stage
+
+- [ ] Final 20-template list approved for the welcome packet (cohort delivery, not stage-day blocker).
+- [ ] Translation platform chosen (e.g. Wordly, Interprefy, KUDO) — needs ops sign-off.
+- [ ] QR code for translation feed printed on `MANDARIN_BRIEF.md` and tested.

@@ -1,6 +1,6 @@
 # THE STACK — 20 AI Templates + Founder OS + Bonuses
 
-This is the value-anchor inventory used in the stack reveal on Day 2 (`CLOSE_SCRIPT.md` § Section 2). Total real-world value lands at **$15,488+**, sold for **$1,497**.
+This is the value-anchor inventory used in the stack reveal on Day 2 (`CLOSE_SCRIPT.md` § Section 2). Total real-world value lands at **$15,488+**, sold for **$1,997**.
 
 The 20 templates are positioned as one bundled component ("Claude Business in a Box") on the stack slide — but the inventory below is what they actually unlock. Print this page and put it in the cohort welcome packet.
 
@@ -17,7 +17,7 @@ The 20 templates are positioned as one bundled component ("Claude Business in a 
 | 5 | Private cohort community | $497 | "100 founders building with you. The brain trust." |
 | 6 | Risk reversal | "priceless" | "No AI live + saving 5+ hrs/week by July 1 → full refund + keep everything" |
 
-**Total real-world value: $15,488+. Today, in this room: $1,497.**
+**Total real-world value: $15,488+. Today, in this room: $1,997.**
 
 ---
 
@@ -163,6 +163,6 @@ Build your Ops AI live. Weekly Focus Report running. Tuesday-morning paralysis s
 
 ## Single-line elevator version (for the crew)
 
-> "$1,497. 4-week cohort. Build 3 AI employees in your business. Pre-bootcamp June 12. 20 templates. Founder OS for a year. Refund if you don't have one running by July 1."
+> "$1,997. 4-week cohort. Build 3 AI employees in your business. Pre-bootcamp June 12. 20 templates. Founder OS for a year. Refund if you don't have one running by July 1."
 
 If a crew member can't deliver this in one breath, they need to rehearse. Print this on a card.
