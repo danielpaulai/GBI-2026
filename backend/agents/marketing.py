@@ -1,7 +1,15 @@
 from langgraph.prebuilt import create_react_agent
 
 from agents._prompts import load_prompt
-from agents.tools import WEB_RESEARCH_TOOLS
+from agents.tools import (
+    BLOG_TOOLS,
+    FULL_RESEARCH_TOOLS,
+    SOCIAL_SCRAPE_TOOLS,
+    WEB_RESEARCH_TOOLS,
+    scrape_facebook_page,
+    scrape_instagram_profile,
+    scrape_linkedin_profile,
+)
 
 
 def _build_specialist_agent(model, *, name: str, prompt: str, tools=None):
@@ -24,6 +32,7 @@ def build_content_agent(model):
             + "You are the Content specialist inside CMO. Use this lane when the request is about posts, scripts, headlines, hooks, content calendars, thought leadership, launch copy, or channel-ready creative.\n"
             + "Return paste-ready assets, not strategy-only commentary."
         ),
+        tools=FULL_RESEARCH_TOOLS,
     )
 
 
@@ -31,6 +40,7 @@ def build_campaigns_agent(model):
     return _build_specialist_agent(
         model,
         name="campaigns",
+        tools=FULL_RESEARCH_TOOLS,
         prompt="""
 You are the Campaigns specialist inside CMO.
 
@@ -119,6 +129,7 @@ def build_brand_voice_agent(model):
         model,
         name="brand_voice",
         prompt=load_prompt("brand_voice_system"),
+        tools=FULL_RESEARCH_TOOLS,
     )
 
 
@@ -143,6 +154,7 @@ def build_linkedin_creator_agent(model):
         model,
         name="linkedin_creator",
         prompt=load_prompt("linkedin_creator_system"),
+        tools=[scrape_linkedin_profile] + FULL_RESEARCH_TOOLS,
     )
 
 
@@ -151,6 +163,7 @@ def build_instagram_creator_agent(model):
         model,
         name="instagram_creator",
         prompt=load_prompt("instagram_creator_system"),
+        tools=[scrape_instagram_profile] + FULL_RESEARCH_TOOLS,
     )
 
 
@@ -167,6 +180,7 @@ def build_facebook_creator_agent(model):
         model,
         name="facebook_creator",
         prompt=load_prompt("facebook_creator_system"),
+        tools=[scrape_facebook_page] + FULL_RESEARCH_TOOLS,
     )
 
 
@@ -263,4 +277,13 @@ def build_facebook_ads_agent(model):
         model,
         name="facebook_ads",
         prompt=load_prompt("facebook_ads_system"),
+    )
+
+
+def build_blog_writer_agent(model):
+    return _build_specialist_agent(
+        model,
+        name="blog_writer",
+        prompt=load_prompt("blog_writer_system"),
+        tools=BLOG_TOOLS,
     )

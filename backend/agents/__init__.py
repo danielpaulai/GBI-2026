@@ -1,5 +1,6 @@
 from agents.marketing import (
 	build_analytics_agent,
+	build_blog_writer_agent,
 	build_brand_voice_agent,
 	build_campaigns_agent,
 	build_competitor_intel_agent,
@@ -30,6 +31,7 @@ from agents.sales import build_sales_agent
 
 __all__ = [
 	"build_analytics_agent",
+	"build_blog_writer_agent",
 	"build_brand_voice_agent",
 	"build_campaigns_agent",
 	"build_competitor_intel_agent",

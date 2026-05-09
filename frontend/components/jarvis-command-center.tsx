@@ -97,6 +97,7 @@ type SubAgentKey =
   | "dm_automation"
   | "squeeze_page"
   | "lead_magnet"
+  | "blog_writer"
   | "instagram_reels"
   | "instagram_stories"
   | "facebook_ads"
@@ -131,6 +132,13 @@ const EXECUTIVES: Executive[] = [
   { key: "coo", label: "COO", role: "Operations command", live: true },
   { key: "cfo", label: "CFO", role: "Finance command", live: true },
 ];
+
+const EXECUTIVE_META: Record<ExecutiveKey, { desc: string; agents: string; color: string }> = {
+  cmo: { desc: "Brand · content · campaigns · channels", agents: "25 specialists", color: "rgba(86,255,241,0.15)" },
+  cro: { desc: "Pipeline · objections · follow-up · close", agents: "6 specialists", color: "rgba(137,246,197,0.15)" },
+  coo: { desc: "Ops · process · cadence · priorities", agents: "6 specialists", color: "rgba(140,191,255,0.15)" },
+  cfo: { desc: "Cashflow · pricing · forecast · margins", agents: "6 specialists", color: "rgba(255,211,122,0.15)" },
+};
 
 const QUICK_COMMANDS = [
   "Create one week marketing for my business",
@@ -194,6 +202,7 @@ const ALL_SUB_AGENT_KEYS: SubAgentKey[] = [
   "dm_automation",
   "squeeze_page",
   "lead_magnet",
+  "blog_writer",
   "instagram_reels",
   "instagram_stories",
   "cro_funnel",
@@ -233,6 +242,7 @@ const SUB_AGENT_META: Record<SubAgentKey, { label: string; branch: string; short
   dm_automation: { label: "DM Sequencer", branch: "Conversation automation", shortLabel: "DMs" },
   squeeze_page: { label: "Squeeze Page", branch: "Lead capture", shortLabel: "Squeeze" },
   lead_magnet: { label: "Lead Magnet Lab", branch: "Lead generation", shortLabel: "Lead Magnet" },
+  blog_writer: { label: "Blog Publisher", branch: "Long-form content", shortLabel: "Blog" },
   cro_funnel: { label: "Conversion Reactor", branch: "Funnel pressure", shortLabel: "CRO" },
   analytics: { label: "Signal Loop", branch: "Performance branch", shortLabel: "Signals" },
   creative_review: { label: "Quality Gate", branch: "Final synthesis", shortLabel: "Review" },
@@ -352,6 +362,7 @@ function createInitialSubAgents(): Record<SubAgentKey, SubAgentState> {
     dm_automation: { status: "idle", detail: "Waiting for route classification." },
     squeeze_page: { status: "idle", detail: "Waiting for route classification." },
     lead_magnet: { status: "idle", detail: "Waiting for route classification." },
+    blog_writer: { status: "idle", detail: "Waiting for route classification." },
     instagram_reels: { status: "idle", detail: "Waiting for route classification." },
     instagram_stories: { status: "idle", detail: "Waiting for route classification." },
     facebook_ads: { status: "idle", detail: "Waiting for route classification." },
@@ -431,14 +442,28 @@ function getPrimaryUpdateNode(update: Record<string, unknown>): string | null {
   return keys[0] ?? null;
 }
 
+type BlogSection = {
+  heading: string;
+  body: string;
+  image_prompt?: string;
+  image_url?: string;
+};
+
 type PreviewCardData = {
-  platform: "LinkedIn" | "Instagram" | "Facebook" | "TikTok" | "Email" | "Newsletter" | "Landing Page" | "X" | "Threads" | "Bluesky" | "Carousel" | "DM Automation" | "Squeeze Page" | "Lead Magnet" | "Reels" | "Stories" | "Facebook Ads";
+  platform: "LinkedIn" | "Instagram" | "Facebook" | "TikTok" | "Email" | "Newsletter" | "Landing Page" | "X" | "Threads" | "Bluesky" | "Carousel" | "DM Automation" | "Squeeze Page" | "Lead Magnet" | "Reels" | "Stories" | "Facebook Ads" | "Blog Post";
   title: string;
   body: string;
   footer: string;
   accent: string;
   visual?: string;
   provisional?: boolean;
+  // Blog-specific
+  sections?: BlogSection[];
+  tags?: string[];
+  seo_keywords?: string[];
+  hero_image_url?: string;
+  read_time?: string;
+  meta_description?: string;
 };
 
 type SynthesisView = "preview" | "jsx";
@@ -1142,9 +1167,150 @@ function buildPreviewCards(subAgents: Record<SubAgentKey, SubAgentState>, select
         });
       }
     }
+
+    if (key === "blog_writer") {
+      const json = tryParseJson(detail);
+      if (json?.title) {
+        addCard({
+          platform: "Blog Post",
+          title: String(json.title),
+          body: String(json.meta_description ?? (json.sections as Array<{body?: string}>)?.[0]?.body?.slice(0, 200) ?? detail.slice(0, 200)),
+          footer: String(json.cta ?? `${(json.sections as unknown[] | undefined)?.length ?? 0} sections · ${json.read_time ?? ""}`),
+          accent: "from-[#f59e0b] via-[#d97706] to-[#92400e]",
+          visual: json.read_time ?? "Long-form article",
+          sections: (json.sections as BlogSection[] | undefined) ?? [],
+          tags: (json.tags as string[] | undefined) ?? [],
+          seo_keywords: (json.seo_keywords as string[] | undefined) ?? [],
+          hero_image_url: typeof json.hero_image_url === "string" ? json.hero_image_url : undefined,
+          read_time: typeof json.read_time === "string" ? json.read_time : undefined,
+          meta_description: typeof json.meta_description === "string" ? json.meta_description : undefined,
+        });
+      }
+    }
   }
 
   return [...primaryCards.values(), ...provisionalCards.values()].slice(0, 9);
+}
+
+// ── Markdown renderer ─────────────────────────────────────────────────────
+function renderInline(text: string): React.ReactNode[] {
+  // Bold **text** and inline code `text`
+  const parts = text.split(/(\*\*[^*]+\*\*|`[^`]+`)/g);
+  return parts.map((part, i) => {
+    if (part.startsWith("**") && part.endsWith("**")) {
+      return <strong key={i} className="font-semibold text-slate-900">{part.slice(2, -2)}</strong>;
+    }
+    if (part.startsWith("`") && part.endsWith("`")) {
+      return <code key={i} className="rounded bg-slate-100 px-1 py-0.5 font-mono text-[13px] text-slate-700">{part.slice(1, -1)}</code>;
+    }
+    return part;
+  });
+}
+
+function MarkdownSection({ text }: { text: string }) {
+  const lines = text.split("\n");
+  const nodes: React.ReactNode[] = [];
+  let listBuffer: string[] = [];
+
+  const flushList = (key: string) => {
+    if (listBuffer.length === 0) return;
+    nodes.push(
+      <ul key={key} className="mt-2 space-y-1.5 pl-1">
+        {listBuffer.map((item, i) => (
+          <li key={i} className="flex gap-2.5 text-[14px] leading-6 text-slate-700">
+            <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-slate-400" />
+            <span>{renderInline(item)}</span>
+          </li>
+        ))}
+      </ul>
+    );
+    listBuffer = [];
+  };
+
+  lines.forEach((line, i) => {
+    const h1 = line.match(/^# (.+)/);
+    const h2 = line.match(/^## (.+)/);
+    const h3 = line.match(/^#{3,}\s+(.+)/);  // ### and #### both become h3
+    const bullet = line.match(/^\s*[-*•]\s+(.+)/);  // allow indented bullets
+    const numbered = line.match(/^\d+\.\s+(.+)/);
+    const hr = line.trim() === "---" || line.trim() === "***" || line.trim() === "___";
+
+    if (h1) {
+      flushList(`fl-${i}`);
+      nodes.push(
+        <div key={i} className="mb-1 mt-6 flex items-center gap-3 first:mt-0">
+          <span className="h-px flex-1 bg-slate-200" />
+          <p className="text-[11px] font-semibold uppercase tracking-[0.32em] text-slate-400">{h1[1]}</p>
+          <span className="h-px flex-1 bg-slate-200" />
+        </div>
+      );
+    } else if (h2) {
+      flushList(`fl-${i}`);
+      nodes.push(
+        <div key={i} className="mt-5 flex items-center gap-2.5 first:mt-0">
+          <span className="h-3.5 w-0.5 rounded-full bg-slate-400" />
+          <p className="font-[family:var(--font-heading)] text-[13px] font-semibold uppercase tracking-[0.28em] text-slate-800">{h2[1]}</p>
+        </div>
+      );
+    } else if (h3) {
+      flushList(`fl-${i}`);
+      nodes.push(
+        <p key={i} className="mt-4 text-[12px] font-semibold uppercase tracking-[0.24em] text-slate-500 first:mt-0">{h3[1]}</p>
+      );
+    } else if (hr) {
+      flushList(`fl-${i}`);
+      nodes.push(<hr key={i} className="my-3 border-slate-200" />);
+    } else if (bullet ?? numbered) {
+      listBuffer.push((bullet?.[1] ?? numbered?.[1]) ?? line);
+    } else if (line.trim() === "") {
+      flushList(`fl-${i}`);
+    } else if (line.trim()) {
+      flushList(`fl-${i}`);
+      nodes.push(
+        <p key={i} className="text-[14px] leading-7 text-slate-700">{renderInline(line)}</p>
+      );
+    }
+  });
+
+  flushList("fl-end");
+  return <>{nodes}</>;
+}
+
+function SynthesisOutput({ text }: { text: string }) {
+  // Split on ## headers to create collapsible sections
+  const sections = text.split(/(?=^##\s)/m);
+  const intro = sections[0] ?? "";
+  const rest = sections.slice(1);
+
+  return (
+    <div className="mt-5 space-y-4">
+      {intro.trim() && (
+        <div className="rounded-[1.2rem] border border-slate-200 bg-white px-5 py-5 shadow-[0_8px_24px_rgba(15,23,42,0.06)]">
+          <MarkdownSection text={intro.trim()} />
+        </div>
+      )}
+      {rest.map((section, i) => {
+        const titleMatch = section.match(/^##\s+(.+)/m);
+        const title = titleMatch?.[1] ?? `Section ${i + 1}`;
+        const body = section.replace(/^##\s+.+\n?/, "").trim();
+        return (
+          <details key={i} open className="group rounded-[1.2rem] border border-slate-200 bg-white shadow-[0_8px_24px_rgba(15,23,42,0.06)]">
+            <summary className="flex cursor-pointer list-none items-center justify-between gap-3 px-5 py-4 select-none">
+              <div className="flex items-center gap-2.5">
+                <span className="h-3.5 w-0.5 rounded-full bg-slate-400 group-open:bg-slate-600" />
+                <span className="font-[family:var(--font-heading)] text-[13px] font-semibold uppercase tracking-[0.28em] text-slate-800">{title}</span>
+              </div>
+              <span className="text-[10px] uppercase tracking-[0.22em] text-slate-400 group-open:hidden">Show</span>
+              <span className="hidden text-[10px] uppercase tracking-[0.22em] text-slate-400 group-open:block">Collapse</span>
+            </summary>
+            <div className="border-t border-slate-100 px-5 py-4">
+              <MarkdownSection text={body} />
+            </div>
+          </details>
+        );
+      })}
+    </div>
+  );
 }
 
 export function JarvisCommandCenter() {
@@ -1753,23 +1919,36 @@ export function JarvisCommandCenter() {
               <div className="jarvis-main-grid">
                 {(panelUnlocked ? visibleExecutives : executivesOpen ? EXECUTIVES.slice(0, executiveRevealCount) : []).map((executive, index) => {
                   const active = executive.key === selectedExecutive;
+                  const meta = EXECUTIVE_META[executive.key];
                   return (
                     <button
                       key={executive.key}
                       type="button"
                       onClick={() => setSelectedExecutive(executive.key)}
-                      className={`jarvis-executive-reveal jarvis-main-card ${
+                      className={`jarvis-executive-reveal jarvis-main-card text-left ${
                         active
-                          ? "is-focused border-[var(--jarvis-cyan)] bg-[rgba(86,255,241,0.1)] text-white shadow-[0_0_24px_rgba(86,255,241,0.12)]"
-                          : "border-white/10 bg-white/[0.03] text-white/55 hover:border-white/25 hover:text-white"
+                          ? "is-focused border-[var(--jarvis-cyan)] text-white shadow-[0_0_28px_rgba(86,255,241,0.14)]"
+                          : "border-white/10 text-white/55 hover:border-white/25 hover:text-white"
                       }`}
-                      style={{ animationDelay: `${index * 90}ms` }}
+                      style={{
+                        animationDelay: `${index * 90}ms`,
+                        background: active ? `radial-gradient(circle at top left, ${meta.color}, transparent 65%)` : undefined,
+                      }}
                     >
-                      <span className="block font-[family:var(--font-heading)] text-lg font-semibold uppercase tracking-[0.38em]">
-                        {executive.label}
-                      </span>
-                      <span className="mt-2 block text-[10px] uppercase tracking-[0.28em] text-white/34">
+                      <div className="flex items-start justify-between gap-2">
+                        <span className="block font-[family:var(--font-heading)] text-lg font-semibold uppercase tracking-[0.38em]">
+                          {executive.label}
+                        </span>
+                        {active && <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--jarvis-cyan)] shadow-[0_0_8px_rgba(86,255,241,0.8)]" />}
+                      </div>
+                      <span className="mt-1.5 block text-[10px] uppercase tracking-[0.28em] text-white/34">
                         {executive.role}
+                      </span>
+                      <span className="mt-3 block border-t border-white/8 pt-3 text-[10px] leading-5 tracking-[0.14em] text-white/40">
+                        {meta.desc}
+                      </span>
+                      <span className="mt-2 block text-[9px] uppercase tracking-[0.24em] text-white/28">
+                        {meta.agents}
                       </span>
                     </button>
                   );
@@ -1808,19 +1987,31 @@ export function JarvisCommandCenter() {
 
                 <div className="grid gap-3 sm:grid-cols-4">
                   {EXECUTIVES.map((executive, index) => {
-                    const phaseLabel =
-                      index < executiveRevealCount
-                        ? "Lane online"
-                        : index < connectorChargeCount
-                          ? "Connector charged"
-                          : "Awaiting release";
+                    const ready = index < executiveRevealCount;
+                    const charged = !ready && index < connectorChargeCount;
+                    const phaseLabel = ready ? "Lane online" : charged ? "Connector charged" : "Awaiting release";
 
                     return (
-                      <div key={executive.key} className="rounded-[1.35rem] border border-white/10 bg-black/25 px-4 py-4 text-left">
-                        <p className="font-[family:var(--font-heading)] text-sm uppercase tracking-[0.26em] text-white/78">
-                          {executive.label}
-                        </p>
-                        <p className="mt-3 text-[11px] uppercase tracking-[0.22em] text-white/38">{phaseLabel}</p>
+                      <div
+                        key={executive.key}
+                        className={`rounded-[1.35rem] border px-4 py-4 text-left transition-all duration-500 ${
+                          ready
+                            ? "border-[var(--jarvis-cyan)]/30 bg-[rgba(86,255,241,0.07)] shadow-[0_0_20px_rgba(86,255,241,0.08)]"
+                            : charged
+                              ? "border-white/15 bg-white/[0.04]"
+                              : "border-white/8 bg-black/20"
+                        }`}
+                      >
+                        <div className="flex items-start justify-between gap-2">
+                          <p className="font-[family:var(--font-heading)] text-sm uppercase tracking-[0.26em] text-white/78">
+                            {executive.label}
+                          </p>
+                          <span
+                            className={`mt-0.5 h-2 w-2 shrink-0 rounded-full ${ready ? "bg-[var(--jarvis-cyan)] shadow-[0_0_8px_rgba(86,255,241,0.6)]" : charged ? "bg-white/30" : "bg-white/12"}`}
+                          />
+                        </div>
+                        <p className="mt-1.5 text-[10px] uppercase tracking-[0.22em] text-white/30">{executive.role}</p>
+                        <p className="mt-3 text-[10px] uppercase tracking-[0.22em] text-white/38">{phaseLabel}</p>
                       </div>
                     );
                   })}
@@ -2018,13 +2209,7 @@ export function JarvisCommandCenter() {
                       ) : null}
                     </div>
                   ) : responseText ? (
-                    <div className="mt-5 space-y-4">
-                      {responseText.split(/\n\n+/).map((chunk, index) => (
-                        <div key={`${chunk.slice(0, 32)}-${index}`} className="rounded-[1.2rem] border border-slate-200 bg-white px-4 py-4 shadow-[0_12px_24px_rgba(15,23,42,0.06)]">
-                          <p className="whitespace-pre-wrap text-[15px] leading-7 text-slate-700">{chunk}</p>
-                        </div>
-                      ))}
-                    </div>
+                    <SynthesisOutput text={responseText} />
                   ) : (
                     <div className="mt-5 flex min-h-56 items-center justify-center rounded-[1.25rem] border border-dashed border-slate-300 bg-white/70 px-6 text-center text-sm uppercase tracking-[0.24em] text-slate-400">
                       Awaiting synthesis from the {selectedExecutiveMeta.label} lane
@@ -2406,6 +2591,7 @@ function AgentGlyph({ agentKey }: { agentKey: SubAgentKey }) {
     dm_automation: "DM",
     squeeze_page: "SQ",
     lead_magnet: "LM",
+    blog_writer: "BL",
     instagram_reels: "IR",
     instagram_stories: "IS",
     facebook_ads: "FA",
@@ -2488,6 +2674,9 @@ function PreviewCard({
   if (card.platform === "Facebook Ads") {
     return <FacebookAdsPreview card={card} index={index} mode={mode} onOpen={onOpen} />;
   }
+  if (card.platform === "Blog Post") {
+    return <BlogPostPreview card={card} index={index} mode={mode} onOpen={onOpen} />;
+  }
   return <NewsletterPreview card={card} index={index} mode={mode} onOpen={onOpen} />;
 }
 
@@ -2529,6 +2718,35 @@ function VerifiedBadge() {
     <span className="inline-flex h-4 w-4 items-center justify-center rounded-full bg-[#1d9bf0] text-white">
       <Check className="h-2.5 w-2.5" />
     </span>
+  );
+}
+
+function ExpandableBody({
+  text,
+  className = "text-[14px] leading-7 text-slate-600 whitespace-pre-wrap",
+  collapsedLines = "line-clamp-5",
+  dark = false,
+}: {
+  text: string;
+  className?: string;
+  collapsedLines?: string;
+  dark?: boolean;
+}) {
+  const [expanded, setExpanded] = useState(false);
+  const isLong = text.length > 320;
+  return (
+    <div>
+      <p className={`${className} ${!expanded && isLong ? collapsedLines : ""}`}>{text}</p>
+      {isLong && (
+        <button
+          type="button"
+          onClick={() => setExpanded(!expanded)}
+          className={`mt-1.5 text-[11px] font-medium tracking-wide transition ${dark ? "text-white/50 hover:text-white/80" : "text-slate-400 hover:text-slate-600"}`}
+        >
+          {expanded ? "▲ Show less" : "▼ See more"}
+        </button>
+      )}
+    </div>
   );
 }
 
@@ -2693,6 +2911,17 @@ function PlatformMark({ platform }: { platform: PreviewCardData["platform"] }) {
     );
   }
 
+  if (platform === "Blog Post") {
+    return (
+      <span className="jarvis-platform-mark" style={{ background: "linear-gradient(135deg,#f59e0b,#d97706)", color: "white" }} aria-label="Blog Post">
+        <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+          <rect x="4" y="3" width="16" height="18" rx="2.5" />
+          <path d="M8 7h8M8 11h8M8 15h5" />
+        </svg>
+      </span>
+    );
+  }
+
   return (
     <span className="jarvis-platform-mark is-newsletter" aria-label="Newsletter">
       <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
@@ -2743,7 +2972,7 @@ function LinkedInPreview({ card, index, mode, onOpen }: { card: PreviewCardData;
 
           <div className="mt-4 space-y-3">
             <p className="text-[16px] font-bold leading-7 text-slate-900">{card.title}</p>
-            <p className="line-clamp-8 text-[14px] leading-7 text-slate-600 whitespace-pre-wrap">{card.body}</p>
+            <ExpandableBody text={card.body} />
           </div>
 
           <div className="mt-4 overflow-hidden rounded-[1.2rem] border border-[#d8e1eb] bg-[#f6f9fc]">
@@ -2802,7 +3031,7 @@ function XPreview({ card, index, mode, onOpen }: { card: PreviewCardData; index:
               <MoreHorizontal className="h-4 w-4 text-white/40" />
             </div>
             <p className="mt-3 text-[15px] font-semibold leading-6 text-white">{card.title}</p>
-            <p className="mt-3 line-clamp-7 text-[14px] leading-6 text-white/78">{card.body}</p>
+            <ExpandableBody text={card.body} className="mt-3 text-[14px] leading-6 text-white/78" dark />
             <div className="mt-4 rounded-[1.15rem] border border-white/10 bg-white/[0.04] p-4">
               <div className="flex items-center gap-2 text-[11px] uppercase tracking-[0.2em] text-white/42">
                 <Image className="h-3.5 w-3.5" />
@@ -2843,7 +3072,7 @@ function ThreadsPreview({ card, index, mode, onOpen }: { card: PreviewCardData; 
           <span className="jarvis-preview-status">{previewStatus(card, "Conversation ready")}</span>
         </div>
         <p className="mt-4 text-[15px] font-semibold leading-6 text-slate-900">{card.title}</p>
-        <p className="mt-3 line-clamp-7 text-sm leading-6 text-slate-700">{card.body}</p>
+        <ExpandableBody text={card.body} className="mt-3 text-sm leading-6 text-slate-700" />
         <div className="mt-4 border-l-2 border-slate-200 pl-4 text-xs text-slate-500">{card.footer}</div>
         <div className="mt-4 flex items-center gap-5 text-[11px] text-slate-400">
           <span>♥ 1.2k</span>
@@ -2873,7 +3102,7 @@ function BlueskyPreview({ card, index, mode, onOpen }: { card: PreviewCardData; 
           <span className="jarvis-preview-status">{previewStatus(card, "Feed-ready")}</span>
         </div>
         <p className="mt-4 text-[15px] font-semibold leading-6 text-slate-900">{card.title}</p>
-        <p className="mt-3 line-clamp-7 text-sm leading-6 text-slate-700">{card.body}</p>
+        <ExpandableBody text={card.body} className="mt-3 text-sm leading-6 text-slate-700" />
         <div className="mt-4 rounded-[1.1rem] bg-sky-50 px-4 py-3 text-xs text-sky-700">{card.footer}</div>
         <div className="mt-4 flex items-center justify-between border-t border-slate-200 pt-3 text-[11px] text-slate-400">
           <span>Reply 21</span>
@@ -2969,7 +3198,7 @@ function FacebookPreview({ card, index, mode, onOpen }: { card: PreviewCardData;
           </div>
           <div className="px-4 py-4">
             <p className="text-[15px] font-semibold leading-6 text-slate-900">{card.title}</p>
-            <p className="mt-3 line-clamp-7 text-sm leading-6 text-slate-700">{card.body}</p>
+            <ExpandableBody text={card.body} className="mt-3 text-sm leading-6 text-slate-700" />
             <div className="mt-4 overflow-hidden rounded-[1.2rem] border border-slate-200 bg-[#f3f6fb]">
               <div className="h-44 bg-[linear-gradient(135deg,#0f172a,#1877f2_52%,#8cc8ff)] px-4 py-4 text-white">
                 <p className="text-[11px] uppercase tracking-[0.22em] text-white/72">Page cover creative</p>
@@ -3044,7 +3273,7 @@ function TikTokPreview({ card, index, mode, onOpen }: { card: PreviewCardData; i
               <span className="rounded-full border border-white/14 px-2 py-1">CTA</span>
             </div>
           </div>
-          <p className="mt-2 line-clamp-5 text-sm leading-6 text-white/82">{card.body}</p>
+          <ExpandableBody text={card.body} className="mt-2 text-sm leading-6 text-white/82" dark />
           <p className="mt-3 text-[11px] uppercase tracking-[0.16em] text-white/52">{card.footer}</p>
         </div>
       </div>
@@ -3099,7 +3328,7 @@ function EmailPreview({ card, index, mode, onOpen }: { card: PreviewCardData; in
               <p className="mt-3 text-[11px] uppercase tracking-[0.16em] text-slate-400">Subject</p>
               <p className="mt-2 text-[15px] font-semibold text-slate-900">{card.title}</p>
               <div className="mt-4 rounded-[1.1rem] border border-slate-200 bg-white p-4 shadow-[0_8px_24px_rgba(15,23,42,0.05)]">
-                <p className="line-clamp-6 text-sm leading-6 text-slate-700">{card.body}</p>
+                <ExpandableBody text={card.body} className="text-sm leading-6 text-slate-700" />
               </div>
             </div>
           </div>
@@ -3150,7 +3379,7 @@ function NewsletterPreview({ card, index, mode, onOpen }: { card: PreviewCardDat
             <div className="px-5 py-5">
               <div className="rounded-[1.1rem] border border-slate-200 bg-[#fffdf8] px-4 py-4">
                 <p className="text-[11px] uppercase tracking-[0.18em] text-slate-400">Lead story</p>
-                <p className="mt-3 line-clamp-6 text-sm leading-7 text-slate-700">{card.body}</p>
+                <ExpandableBody text={card.body} className="mt-3 text-sm leading-7 text-slate-700" />
               </div>
               <div className="mt-4 flex items-center justify-between rounded-[1.1rem] border border-amber-200 bg-amber-50 px-4 py-3 text-xs uppercase tracking-[0.16em] text-amber-700">
                 <span>{card.footer}</span>
@@ -3518,6 +3747,106 @@ function FacebookAdsPreview({ card, index, mode, onOpen }: { card: PreviewCardDa
           <div className="flex items-center justify-between gap-3 border-t border-slate-100 px-5 py-3">
             <p className="text-[11px] text-slate-400">{card.footer}</p>
             <button type="button" className="rounded-md bg-[#0866ff] px-4 py-2 text-[11px] font-semibold text-white">{card.footer}</button>
+          </div>
+        </div>
+      </div>
+    </article>
+  );
+}
+
+function BlogPostPreview({ card, index, mode, onOpen }: { card: PreviewCardData; index: number; mode: PreviewMode; onOpen?: () => void }) {
+  const [expanded, setExpanded] = useState(false);
+  const sections = card.sections ?? [];
+  const tags = card.tags ?? [];
+  const seoKeywords = card.seo_keywords ?? [];
+
+  return (
+    <article className={`${previewCardClass(card, mode)} bg-[#fafaf8]`} style={previewStyle(mode, index)}>
+      <PreviewExpandButton onOpen={mode === "grid" ? onOpen : undefined} />
+      <div className={`jarvis-preview-accent bg-[linear-gradient(135deg,#f59e0b,#d97706,#92400e)]`} />
+      <div className="p-3">
+        <div className="overflow-hidden rounded-[1.4rem] border border-amber-200 bg-white shadow-[0_18px_42px_rgba(245,158,11,0.10)]">
+          {/* Blog browser chrome */}
+          <div className="flex items-center gap-3 border-b border-slate-100 bg-[#f8f8f6] px-4 py-2.5">
+            <div className="flex gap-1.5">
+              <span className="h-2.5 w-2.5 rounded-full bg-red-400" />
+              <span className="h-2.5 w-2.5 rounded-full bg-amber-400" />
+              <span className="h-2.5 w-2.5 rounded-full bg-emerald-400" />
+            </div>
+            <div className="flex flex-1 items-center gap-2 rounded-full bg-white border border-slate-200 px-3 py-1">
+              <span className="text-[10px] text-slate-400 truncate">blog.{card.title.toLowerCase().replace(/[^a-z0-9]+/g, "-").slice(0, 28)}</span>
+            </div>
+            <span className="text-[10px] uppercase tracking-[0.16em] text-amber-600">{card.read_time ?? card.visual ?? "Article"}</span>
+          </div>
+          {/* Hero image or gradient */}
+          {card.hero_image_url ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={card.hero_image_url} alt={card.title} className="w-full h-40 object-cover" />
+          ) : (
+            <div className={`h-32 bg-gradient-to-br ${card.accent} relative overflow-hidden`}>
+              <div className="absolute inset-0 bg-[repeating-linear-gradient(45deg,transparent,transparent_10px,rgba(255,255,255,0.04)_10px,rgba(255,255,255,0.04)_20px)]" />
+              <div className="absolute bottom-0 left-0 right-0 p-4">
+                <p className="text-[10px] uppercase tracking-[0.22em] text-white/60">Featured Article</p>
+              </div>
+            </div>
+          )}
+          {/* Title + meta */}
+          <div className="px-5 pt-4 pb-3">
+            <p className="text-[18px] font-bold leading-tight text-slate-900 line-clamp-2">{card.title}</p>
+            <p className="mt-2 text-[12px] leading-5 text-slate-500 line-clamp-2">{card.meta_description ?? card.body}</p>
+            {/* Tags */}
+            {tags.length > 0 && (
+              <div className="mt-3 flex flex-wrap gap-1.5">
+                {tags.slice(0, 4).map((tag, i) => (
+                  <span key={i} className="rounded-full border border-amber-200 bg-amber-50 px-2 py-0.5 text-[10px] font-medium text-amber-700">{tag}</span>
+                ))}
+              </div>
+            )}
+          </div>
+          {/* Expandable sections */}
+          {sections.length > 0 && (
+            <div className="border-t border-slate-100 px-5 pb-4">
+              <button
+                type="button"
+                onClick={() => setExpanded(!expanded)}
+                className="mt-3 flex w-full items-center justify-between gap-2 rounded-xl bg-slate-50 border border-slate-200 px-3 py-2.5 text-[11px] font-medium uppercase tracking-[0.18em] text-slate-600 transition hover:bg-slate-100"
+              >
+                <span>{expanded ? "Collapse sections" : `Read article · ${sections.length} sections`}</span>
+                <span className={`transition-transform ${expanded ? "rotate-180" : ""}`}>▾</span>
+              </button>
+              {expanded && (
+                <div className="mt-3 space-y-4">
+                  {sections.map((section, i) => (
+                    <div key={i} className="border-l-2 border-amber-300 pl-4">
+                      <p className="text-[13px] font-semibold text-slate-800">{section.heading}</p>
+                      <p className="mt-1.5 text-[12px] leading-5 text-slate-600">{section.body.slice(0, 280)}{section.body.length > 280 ? "…" : ""}</p>
+                      {section.image_prompt && (
+                        <p className="mt-2 text-[10px] italic text-slate-400">Image: {section.image_prompt.slice(0, 80)}…</p>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+          {/* SEO keywords */}
+          {seoKeywords.length > 0 && (
+            <div className="border-t border-slate-100 px-5 py-3">
+              <p className="text-[10px] uppercase tracking-[0.18em] text-slate-400 mb-1.5">SEO keywords</p>
+              <div className="flex flex-wrap gap-1">
+                {seoKeywords.map((kw, i) => (
+                  <span key={i} className="rounded border border-slate-200 bg-slate-50 px-2 py-0.5 text-[10px] text-slate-500">{kw}</span>
+                ))}
+              </div>
+            </div>
+          )}
+          {/* CTA footer */}
+          <div className="border-t border-slate-100 px-5 py-3 flex items-center justify-between gap-2">
+            <div className="flex items-center gap-2">
+              <PlatformMark platform="Blog Post" />
+              <span className="text-[11px] text-slate-400">{card.footer}</span>
+            </div>
+            <span className={`jarvis-preview-status`}>{previewStatus(card, "Draft ready")}</span>
           </div>
         </div>
       </div>

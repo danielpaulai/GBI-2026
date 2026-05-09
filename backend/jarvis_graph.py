@@ -13,6 +13,7 @@ from langgraph_supervisor import create_supervisor
 
 from agents import (
     build_analytics_agent,
+    build_blog_writer_agent,
     build_brand_voice_agent,
     build_campaigns_agent,
     build_competitor_intel_agent,
@@ -113,6 +114,7 @@ MARKETING_SWARM_ORDER: tuple[str, ...] = (
     "dm_automation",
     "squeeze_page",
     "lead_magnet",
+    "blog_writer",
     "cro_funnel",
     "analytics",
     "creative_review",
@@ -392,6 +394,13 @@ CAPABILITY_REGISTRY: dict[str, Capability] = {
         project_types=("content_system", "channel_build"),
         keywords=("stories", "instagram stories", "story sequence", "ig stories", "story"),
     ),
+    "blog_writer": Capability(
+        key="blog_writer",
+        label="Blog Publisher",
+        department="marketing",
+        project_types=("content_system", "content_creation", "launch_build"),
+        keywords=("blog", "article", "seo content", "long-form", "blog post", "thought leadership article", "content marketing"),
+    ),
     "facebook_ads": Capability(
         key="facebook_ads",
         label="Ads Engine",
@@ -504,6 +513,7 @@ MARKETING_AGENT_BUILDERS = {
     "instagram_reels": build_instagram_reels_agent,
     "instagram_stories": build_instagram_stories_agent,
     "facebook_ads": build_facebook_ads_agent,
+    "blog_writer": build_blog_writer_agent,
     "cro_funnel": build_cro_funnel_agent,
     "analytics": build_analytics_agent,
     "creative_review": build_creative_review_agent,
