@@ -63,6 +63,9 @@ app.add_middleware(
     allow_origins=[
         "http://localhost:3000",
         "http://127.0.0.1:3000",
+        "https://gbi-2026.vercel.app",
+        "https://frontend-one-smoky-36.vercel.app",
+        *([os.environ["FRONTEND_URL"]] if os.environ.get("FRONTEND_URL") else []),
     ],
     allow_credentials=True,
     allow_methods=["*"],

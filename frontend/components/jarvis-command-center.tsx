@@ -85,13 +85,21 @@ type SubAgentKey =
   | "offers"
   | "brand_voice"
   | "landing_page"
+  | "landing_page_architect"
   | "linkedin_creator"
+  | "linkedin_carousel"
   | "instagram_creator"
   | "tiktok_creator"
   | "facebook_creator"
   | "email_writer"
   | "email_sequence"
   | "newsletter_writer"
+  | "dm_automation"
+  | "squeeze_page"
+  | "lead_magnet"
+  | "instagram_reels"
+  | "instagram_stories"
+  | "facebook_ads"
   | "cro_funnel"
   | "analytics"
   | "creative_review"
@@ -173,13 +181,21 @@ const ALL_SUB_AGENT_KEYS: SubAgentKey[] = [
   "content",
   "brand_voice",
   "landing_page",
+  "landing_page_architect",
   "linkedin_creator",
+  "linkedin_carousel",
   "instagram_creator",
   "tiktok_creator",
   "facebook_creator",
+  "facebook_ads",
   "email_writer",
   "email_sequence",
   "newsletter_writer",
+  "dm_automation",
+  "squeeze_page",
+  "lead_magnet",
+  "instagram_reels",
+  "instagram_stories",
   "cro_funnel",
   "analytics",
   "creative_review",
@@ -202,13 +218,21 @@ const SUB_AGENT_META: Record<SubAgentKey, { label: string; branch: string; short
   offers: { label: "Offer Forge", branch: "Positioning branch", shortLabel: "Offers" },
   brand_voice: { label: "Voice Foundry", branch: "Tone system", shortLabel: "Voice" },
   landing_page: { label: "Landing Page Architect", branch: "Conversion page", shortLabel: "Landing" },
+  landing_page_architect: { label: "Page Architect", branch: "Full page build", shortLabel: "Page Build" },
   linkedin_creator: { label: "LinkedIn Studio", branch: "Channel execution", shortLabel: "LinkedIn" },
+  linkedin_carousel: { label: "Carousel Architect", branch: "Slide strategy", shortLabel: "Carousel" },
   instagram_creator: { label: "Instagram Studio", branch: "Channel execution", shortLabel: "Instagram" },
+  instagram_reels: { label: "Reels Studio", branch: "Short-form video", shortLabel: "Reels" },
+  instagram_stories: { label: "Stories Lab", branch: "Story sequences", shortLabel: "Stories" },
   tiktok_creator: { label: "TikTok Reactor", branch: "Short-form execution", shortLabel: "TikTok" },
   facebook_creator: { label: "Facebook Signal", branch: "Channel execution", shortLabel: "Facebook" },
+  facebook_ads: { label: "Ads Engine", branch: "Paid acquisition", shortLabel: "FB Ads" },
   email_writer: { label: "Email Forge", branch: "Channel execution", shortLabel: "Email" },
   email_sequence: { label: "Sequence Architect", branch: "Lifecycle sequence", shortLabel: "Sequence" },
   newsletter_writer: { label: "Newsletter Desk", branch: "Channel execution", shortLabel: "Newsletter" },
+  dm_automation: { label: "DM Sequencer", branch: "Conversation automation", shortLabel: "DMs" },
+  squeeze_page: { label: "Squeeze Page", branch: "Lead capture", shortLabel: "Squeeze" },
+  lead_magnet: { label: "Lead Magnet Lab", branch: "Lead generation", shortLabel: "Lead Magnet" },
   cro_funnel: { label: "Conversion Reactor", branch: "Funnel pressure", shortLabel: "CRO" },
   analytics: { label: "Signal Loop", branch: "Performance branch", shortLabel: "Signals" },
   creative_review: { label: "Quality Gate", branch: "Final synthesis", shortLabel: "Review" },
@@ -323,6 +347,14 @@ function createInitialSubAgents(): Record<SubAgentKey, SubAgentState> {
     email_writer: { status: "idle", detail: "Waiting for route classification." },
     email_sequence: { status: "idle", detail: "Waiting for route classification." },
     newsletter_writer: { status: "idle", detail: "Waiting for route classification." },
+    landing_page_architect: { status: "idle", detail: "Waiting for route classification." },
+    linkedin_carousel: { status: "idle", detail: "Waiting for route classification." },
+    dm_automation: { status: "idle", detail: "Waiting for route classification." },
+    squeeze_page: { status: "idle", detail: "Waiting for route classification." },
+    lead_magnet: { status: "idle", detail: "Waiting for route classification." },
+    instagram_reels: { status: "idle", detail: "Waiting for route classification." },
+    instagram_stories: { status: "idle", detail: "Waiting for route classification." },
+    facebook_ads: { status: "idle", detail: "Waiting for route classification." },
     cro_funnel: { status: "idle", detail: "Waiting for route classification." },
     analytics: { status: "idle", detail: "Waiting for route classification." },
     creative_review: { status: "idle", detail: "Waiting for route classification." },
@@ -400,7 +432,7 @@ function getPrimaryUpdateNode(update: Record<string, unknown>): string | null {
 }
 
 type PreviewCardData = {
-  platform: "LinkedIn" | "Instagram" | "Facebook" | "TikTok" | "Email" | "Newsletter" | "Landing Page" | "X" | "Threads" | "Bluesky";
+  platform: "LinkedIn" | "Instagram" | "Facebook" | "TikTok" | "Email" | "Newsletter" | "Landing Page" | "X" | "Threads" | "Bluesky" | "Carousel" | "DM Automation" | "Squeeze Page" | "Lead Magnet" | "Reels" | "Stories" | "Facebook Ads";
   title: string;
   body: string;
   footer: string;
@@ -604,6 +636,31 @@ function parseInlineFields(line: string): Record<string, string> {
   }, {});
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function tryParseJson(text: string): Record<string, any> | null {
+  try {
+    const cleaned = text.trim().replace(/^```(?:json)?\s*/i, "").replace(/\s*```$/, "");
+    const parsed = JSON.parse(cleaned);
+    if (typeof parsed === "object" && parsed !== null && !Array.isArray(parsed)) return parsed;
+    return null;
+  } catch {
+    return null;
+  }
+}
+
+function jsonFirstPreview(detail: string): string | null {
+  const json = tryParseJson(detail);
+  if (!json) return null;
+  if (typeof json.channel_goal === "string") return json.channel_goal;
+  if (typeof json.email_objective === "string") return json.email_objective;
+  if (typeof json.newsletter_objective === "string") return json.newsletter_objective;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const first: any = json.posts?.[0] ?? json.assets?.[0] ?? json.video_concepts?.[0] ?? json.post_variants?.[0] ?? json.emails?.[0] ?? json.concepts?.[0];
+  if (typeof first?.hook === "string") return first.hook.slice(0, 120);
+  if (typeof first?.subject === "string") return first.subject.slice(0, 120);
+  return null;
+}
+
 function buildPreviewCards(subAgents: Record<SubAgentKey, SubAgentState>, selectedKeys: SubAgentKey[]): PreviewCardData[] {
   const primaryCards = new Map<PreviewCardData["platform"], PreviewCardData>();
   const provisionalCards = new Map<PreviewCardData["platform"], PreviewCardData>();
@@ -769,30 +826,58 @@ function buildPreviewCards(subAgents: Record<SubAgentKey, SubAgentState>, select
     }
 
     if (key === "linkedin_creator") {
-      for (const row of (sections.Posts ?? []).slice(0, 2)) {
-        const fields = parseInlineFields(row);
-        if (!fields.hook && !fields.body) continue;
-        addCard({
-          platform: "LinkedIn",
-          title: fields.hook ?? "Founder insight",
-          body: fields.body ?? detail,
-          footer: fields.CTA ?? sections["Posting Rhythm"]?.[0] ?? "View post",
-          accent: "from-[#0a66c2] via-[#1d9bf0] to-[#7dd3fc]",
-        });
+      const json = tryParseJson(detail);
+      if (json?.posts && Array.isArray(json.posts)) {
+        for (const post of (json.posts as Array<{hook?: string; body?: string; CTA?: string}>).slice(0, 3)) {
+          if (!post.hook && !post.body) continue;
+          addCard({
+            platform: "LinkedIn",
+            title: post.hook ?? "Founder insight",
+            body: post.body ?? detail,
+            footer: post.CTA ?? String(json.posting_rhythm ?? "View post"),
+            accent: "from-[#0a66c2] via-[#1d9bf0] to-[#7dd3fc]",
+          });
+        }
+      } else {
+        for (const row of (sections.Posts ?? []).slice(0, 2)) {
+          const fields = parseInlineFields(row);
+          if (!fields.hook && !fields.body) continue;
+          addCard({
+            platform: "LinkedIn",
+            title: fields.hook ?? "Founder insight",
+            body: fields.body ?? detail,
+            footer: fields.CTA ?? sections["Posting Rhythm"]?.[0] ?? "View post",
+            accent: "from-[#0a66c2] via-[#1d9bf0] to-[#7dd3fc]",
+          });
+        }
       }
     }
 
     if (key === "instagram_creator") {
-      for (const row of (sections.Assets ?? []).slice(0, 2)) {
-        const fields = parseInlineFields(row);
-        addCard({
-          platform: "Instagram",
-          title: fields.asset ?? "Carousel concept",
-          body: fields.angle ?? sections["Content Mix"]?.join(" ") ?? detail,
-          footer: fields.CTA ?? sections["Story Hooks"]?.[0] ?? "See reel",
-          accent: "from-[#f09433] via-[#dc2743] to-[#833ab4]",
-          visual: fields.asset ?? "Visual asset",
-        });
+      const json = tryParseJson(detail);
+      if (json?.assets && Array.isArray(json.assets)) {
+        for (const asset of (json.assets as Array<{format?: string; hook?: string; caption_angle?: string; visual_direction?: string; CTA?: string}>).slice(0, 3)) {
+          addCard({
+            platform: "Instagram",
+            title: asset.hook ?? asset.format ?? "Instagram concept",
+            body: asset.caption_angle ?? detail,
+            footer: asset.CTA ?? "See post",
+            accent: "from-[#f09433] via-[#dc2743] to-[#833ab4]",
+            visual: asset.visual_direction ?? asset.format ?? "Visual asset",
+          });
+        }
+      } else {
+        for (const row of (sections.Assets ?? []).slice(0, 2)) {
+          const fields = parseInlineFields(row);
+          addCard({
+            platform: "Instagram",
+            title: fields.asset ?? "Carousel concept",
+            body: fields.angle ?? sections["Content Mix"]?.join(" ") ?? detail,
+            footer: fields.CTA ?? sections["Story Hooks"]?.[0] ?? "See reel",
+            accent: "from-[#f09433] via-[#dc2743] to-[#833ab4]",
+            visual: fields.asset ?? "Visual asset",
+          });
+        }
       }
     }
 
@@ -812,73 +897,254 @@ function buildPreviewCards(subAgents: Record<SubAgentKey, SubAgentState>, select
     }
 
     if (key === "tiktok_creator") {
-      for (const row of (sections["Video Concepts"] ?? []).slice(0, 2)) {
-        const fields = parseInlineFields(row);
-        addCard({
-          platform: "TikTok",
-          title: fields.title ?? fields.hook ?? "Vertical video concept",
-          body: fields.script ?? detail,
-          footer: fields.CTA ?? sections["Trend Notes"]?.[0] ?? "Watch clip",
-          accent: "from-[#111111] via-[#25f4ee] to-[#fe2c55]",
-          visual: fields.shot_direction ?? "Vertical video concept",
-        });
+      const json = tryParseJson(detail);
+      if (json?.video_concepts && Array.isArray(json.video_concepts)) {
+        for (const concept of (json.video_concepts as Array<{title?: string; hook?: string; script?: string; shot_direction?: string; CTA?: string}>).slice(0, 3)) {
+          addCard({
+            platform: "TikTok",
+            title: concept.title ?? concept.hook ?? "Vertical video concept",
+            body: concept.script ?? concept.hook ?? detail,
+            footer: concept.CTA ?? "Watch clip",
+            accent: "from-[#111111] via-[#25f4ee] to-[#fe2c55]",
+            visual: concept.shot_direction ?? "Vertical video",
+          });
+        }
+      } else {
+        for (const row of (sections["Video Concepts"] ?? []).slice(0, 2)) {
+          const fields = parseInlineFields(row);
+          addCard({
+            platform: "TikTok",
+            title: fields.title ?? fields.hook ?? "Vertical video concept",
+            body: fields.script ?? detail,
+            footer: fields.CTA ?? sections["Trend Notes"]?.[0] ?? "Watch clip",
+            accent: "from-[#111111] via-[#25f4ee] to-[#fe2c55]",
+            visual: fields.shot_direction ?? "Vertical video concept",
+          });
+        }
       }
     }
 
     if (key === "facebook_creator") {
-      for (const row of (sections["Post Variants"] ?? []).slice(0, 2)) {
-        const fields = parseInlineFields(row);
-        addCard({
-          platform: "Facebook",
-          title: fields.hook ?? fields.community_angle ?? "Community post",
-          body: fields.body ?? sections["Community Angle"]?.[0] ?? detail,
-          footer: fields.CTA ?? sections["Engagement Prompts"]?.[0] ?? "Join conversation",
-          accent: "from-[#1877f2] via-[#60a5fa] to-[#bfdbfe]",
-        });
+      const json = tryParseJson(detail);
+      if (json?.post_variants && Array.isArray(json.post_variants)) {
+        for (const post of (json.post_variants as Array<{format?: string; hook?: string; body?: string; CTA?: string}>).slice(0, 3)) {
+          addCard({
+            platform: "Facebook",
+            title: post.hook ?? post.format ?? "Community post",
+            body: post.body ?? detail,
+            footer: post.CTA ?? "Join conversation",
+            accent: "from-[#1877f2] via-[#60a5fa] to-[#bfdbfe]",
+          });
+        }
+      } else {
+        for (const row of (sections["Post Variants"] ?? []).slice(0, 2)) {
+          const fields = parseInlineFields(row);
+          addCard({
+            platform: "Facebook",
+            title: fields.hook ?? fields.community_angle ?? "Community post",
+            body: fields.body ?? sections["Community Angle"]?.[0] ?? detail,
+            footer: fields.CTA ?? sections["Engagement Prompts"]?.[0] ?? "Join conversation",
+            accent: "from-[#1877f2] via-[#60a5fa] to-[#bfdbfe]",
+          });
+        }
       }
     }
 
     if (key === "email_writer") {
-      for (const row of (sections.Emails ?? []).slice(0, 2)) {
-        const fields = parseInlineFields(row);
-        addCard({
-          platform: "Email",
-          title: fields.subject ?? "Subject line",
-          body: fields.purpose ?? fields.body_outline ?? detail,
-          footer: fields.CTA ?? sections["Send Cadence"]?.[0] ?? "Open email",
-          accent: "from-[#64748b] via-[#94a3b8] to-[#e2e8f0]",
-        });
+      const json = tryParseJson(detail);
+      if (json?.emails && Array.isArray(json.emails)) {
+        for (const email of (json.emails as Array<{subject?: string; opening?: string; body?: string; CTA?: string}>).slice(0, 3)) {
+          addCard({
+            platform: "Email",
+            title: email.subject ?? "Subject line",
+            body: email.body ?? email.opening ?? detail,
+            footer: email.CTA ?? "Open email",
+            accent: "from-[#64748b] via-[#94a3b8] to-[#e2e8f0]",
+          });
+        }
+      } else {
+        for (const row of (sections.Emails ?? []).slice(0, 2)) {
+          const fields = parseInlineFields(row);
+          addCard({
+            platform: "Email",
+            title: fields.subject ?? "Subject line",
+            body: fields.purpose ?? fields.body_outline ?? detail,
+            footer: fields.CTA ?? sections["Send Cadence"]?.[0] ?? "Open email",
+            accent: "from-[#64748b] via-[#94a3b8] to-[#e2e8f0]",
+          });
+        }
       }
     }
 
     if (key === "email_sequence") {
-      for (const row of (sections.Emails ?? []).slice(0, 2)) {
-        const fields = parseInlineFields(row);
-        addCard({
-          platform: "Email",
-          title: fields.subject ?? "Sequence email",
-          body: fields.purpose ?? fields.body_outline ?? sections["Sequencing Logic"]?.join(" ") ?? detail,
-          footer: fields.CTA ?? sections.CTA?.[0] ?? "Open email",
-          accent: "from-[#0f766e] via-[#14b8a6] to-[#ccfbf1]",
-        });
+      const json = tryParseJson(detail);
+      if (json?.emails && Array.isArray(json.emails)) {
+        for (const email of (json.emails as Array<{subject?: string; opening?: string; body?: string; CTA?: string}>).slice(0, 2)) {
+          addCard({
+            platform: "Email",
+            title: email.subject ?? "Sequence email",
+            body: email.body ?? email.opening ?? detail,
+            footer: email.CTA ?? "Open email",
+            accent: "from-[#0f766e] via-[#14b8a6] to-[#ccfbf1]",
+          });
+        }
+      } else {
+        for (const row of (sections.Emails ?? []).slice(0, 2)) {
+          const fields = parseInlineFields(row);
+          addCard({
+            platform: "Email",
+            title: fields.subject ?? "Sequence email",
+            body: fields.purpose ?? fields.body_outline ?? sections["Sequencing Logic"]?.join(" ") ?? detail,
+            footer: fields.CTA ?? sections.CTA?.[0] ?? "Open email",
+            accent: "from-[#0f766e] via-[#14b8a6] to-[#ccfbf1]",
+          });
+        }
       }
     }
 
     if (key === "newsletter_writer") {
-      for (const row of (sections.Sections ?? []).slice(0, 2)) {
-        const fields = parseInlineFields(row);
+      const json = tryParseJson(detail);
+      if (json?.concepts && Array.isArray(json.concepts)) {
+        for (const concept of (json.concepts as Array<{subject?: string; opening_angle?: string; body?: string; CTA?: string}>).slice(0, 2)) {
+          addCard({
+            platform: "Newsletter",
+            title: concept.subject ?? "Newsletter issue",
+            body: concept.body ?? concept.opening_angle ?? detail,
+            footer: concept.CTA ?? "Read issue",
+            accent: "from-[#c084fc] via-[#f0abfc] to-[#fde68a]",
+          });
+        }
+      } else {
+        for (const row of (sections.Sections ?? []).slice(0, 2)) {
+          const fields = parseInlineFields(row);
+          addCard({
+            platform: "Newsletter",
+            title: fields.section ?? sections["Issue Theme"]?.[0] ?? "Issue section",
+            body: fields.purpose ?? fields.bullets ?? detail,
+            footer: sections.CTA?.[0] ?? "Read issue",
+            accent: "from-[#c084fc] via-[#f0abfc] to-[#fde68a]",
+          });
+        }
+      }
+    }
+    
+    if (key === "linkedin_carousel") {
+      const json = tryParseJson(detail);
+      if (json?.slides && Array.isArray(json.slides)) {
+        const coverSlide = (json.slides as Array<{type?: string; title?: string; subtitle?: string}>).find((s) => s.type === "cover");
         addCard({
-          platform: "Newsletter",
-          title: fields.section ?? sections["Issue Theme"]?.[0] ?? "Issue section",
-          body: fields.purpose ?? fields.bullets ?? detail,
-          footer: sections.CTA?.[0] ?? "Read issue",
-          accent: "from-[#c084fc] via-[#f0abfc] to-[#fde68a]",
+          platform: "Carousel",
+          title: coverSlide?.title ?? json.caption_hook ?? "LinkedIn carousel",
+          body: `${json.intent ?? "Carousel"} intent · ${(json.slides as unknown[]).length} slides\n\n${(json.slides as Array<{title?: string; content?: string}>).slice(1, 4).map((s) => `${s.title ?? ""}: ${(s.content ?? "").slice(0, 60)}`).join("\n")}`,
+          footer: (json.slides as Array<{cta_text?: string}>).find((s) => s.cta_text)?.cta_text ?? "See carousel",
+          accent: "from-[#0a66c2] via-[#1d9bf0] to-[#7dd3fc]",
+          visual: `${(json.slides as unknown[]).length} slides · ${json.intent ?? ""}`,
+        });
+      }
+    }
+
+    if (key === "landing_page_architect") {
+      const json = tryParseJson(detail);
+      if (json?.hero_headline) {
+        addCard({
+          platform: "Landing Page",
+          title: String(json.hero_headline),
+          body: String(json.hero_subheadline ?? json.conversion_goal ?? detail),
+          footer: String(json.primary_cta ?? "Learn more"),
+          accent: "from-[#0f172a] via-[#1e293b] to-[#38bdf8]",
+          visual: `${String(json.page_style ?? "page").toUpperCase()} · ${Array.isArray(json.sections) ? (json.sections as unknown[]).length : 0} sections`,
+        });
+      }
+    }
+
+    if (key === "dm_automation") {
+      const json = tryParseJson(detail);
+      if (json?.messages && Array.isArray(json.messages)) {
+        const firstMsg = (json.messages as Array<{message?: string; trigger?: string}>)[0];
+        addCard({
+          platform: "DM Automation",
+          title: `${json.platform ?? "DM"} sequence · ${(json.messages as unknown[]).length} messages`,
+          body: firstMsg?.message ?? detail,
+          footer: `${json.goal ?? "engagement"} · ${firstMsg?.trigger ?? "on trigger"}`,
+          accent: "from-[#7c3aed] via-[#a855f7] to-[#e879f9]",
+        });
+      }
+    }
+
+    if (key === "squeeze_page") {
+      const json = tryParseJson(detail);
+      if (json?.headline) {
+        addCard({
+          platform: "Squeeze Page",
+          title: String(json.headline),
+          body: `${json.subheadline ?? ""}\n\n${Array.isArray(json.benefits) ? (json.benefits as string[]).slice(0, 3).join("\n") : ""}`,
+          footer: String(json.cta_text ?? "Get access"),
+          accent: "from-[#059669] via-[#10b981] to-[#6ee7b7]",
+        });
+      }
+    }
+
+    if (key === "lead_magnet") {
+      const json = tryParseJson(detail);
+      if (json?.title) {
+        addCard({
+          platform: "Lead Magnet",
+          title: String(json.title),
+          body: `${json.subtitle ?? ""}\n\n${Array.isArray(json.table_of_contents) ? (json.table_of_contents as Array<{title?: string}>).slice(0, 4).map((s) => `· ${s.title ?? ""}`).join("\n") : ""}`,
+          footer: String(json.delivery_email?.subject ?? "Download guide"),
+          accent: "from-[#d97706] via-[#f59e0b] to-[#fde68a]",
+          visual: String(json.lead_magnet_type ?? "guide"),
+        });
+      }
+    }
+
+    if (key === "instagram_reels") {
+      const json = tryParseJson(detail);
+      if (json?.reels && Array.isArray(json.reels)) {
+        const reel = (json.reels as Array<{intent?: string; hook_text?: string; hook_spoken?: string; script?: string; CTA?: string}>)[0];
+        addCard({
+          platform: "Reels",
+          title: reel?.hook_text ?? "Instagram Reel",
+          body: `${reel?.intent ?? "Reel"}\n\n${reel?.hook_spoken ?? ""}\n\n${(reel?.script ?? "").slice(0, 160)}`,
+          footer: reel?.CTA ?? json.posting_rhythm ?? "See reel",
+          accent: "from-[#f58529] via-[#dd2a7b] to-[#8134af]",
+          visual: `${(json.reels as unknown[]).length} reels · ${json.posting_rhythm ?? ""}`,
+        });
+      }
+    }
+
+    if (key === "instagram_stories") {
+      const json = tryParseJson(detail);
+      if (json?.sequences && Array.isArray(json.sequences)) {
+        const seq = (json.sequences as Array<{sequence_name?: string; frames?: Array<{headline?: string}>; final_cta?: string}>)[0];
+        addCard({
+          platform: "Stories",
+          title: seq?.sequence_name ?? json.sequence_goal ?? "Story Sequence",
+          body: `${json.sequence_type ?? "Sequence"}\n\n${seq?.frames?.slice(0, 3).map((f) => f.headline).join(" → ") ?? ""}`,
+          footer: seq?.final_cta ?? "View sequence",
+          accent: "from-[#f58529] via-[#dd2a7b] to-[#515bd4]",
+          visual: `${json.total_frames ?? 5} frames · ${json.sequence_type ?? ""}`,
+        });
+      }
+    }
+
+    if (key === "facebook_ads") {
+      const json = tryParseJson(detail);
+      if (json?.ads && Array.isArray(json.ads)) {
+        const coldAd = (json.ads as Array<{funnel_stage?: string; headline?: string; primary_text?: string; cta_button?: string; objection_addressed?: string}>).find((a) => a.funnel_stage === "COLD") ?? (json.ads as Array<{headline?: string; primary_text?: string; cta_button?: string; objection_addressed?: string}>)[0];
+        addCard({
+          platform: "Facebook Ads",
+          title: coldAd?.headline ?? json.campaign_goal ?? "Ad Campaign",
+          body: coldAd?.primary_text ?? detail,
+          footer: coldAd?.cta_button ?? "See ads",
+          accent: "from-[#0866ff] via-[#1877f2] to-[#42a5f5]",
+          visual: `${(json.ads as unknown[]).length} ads · ${coldAd?.objection_addressed ?? ""}`,
         });
       }
     }
   }
 
-  return [...primaryCards.values(), ...provisionalCards.values()].slice(0, 6);
+  return [...primaryCards.values(), ...provisionalCards.values()].slice(0, 9);
 }
 
 export function JarvisCommandCenter() {
@@ -1636,112 +1902,135 @@ export function JarvisCommandCenter() {
 
                 {subAgentsVisible ? <CmoBranchTree rootLabel={selectedExecutiveMeta.label} subAgents={subAgents} selectedKeys={selectedSubAgents} /> : null}
 
-                <div className="grid gap-4 xl:grid-cols-[1.08fr_0.92fr]">
-                  <section className="rounded-[1.75rem] border border-[#ddd5c7] bg-[#f7f3eb] p-5 text-slate-900 shadow-[0_20px_60px_rgba(15,23,42,0.18)]">
-                    <div className="flex items-center justify-between gap-3 border-b border-slate-300/70 pb-4">
-                      <div>
-                        <p className="text-[11px] font-medium uppercase tracking-[0.28em] text-slate-500">Claude-style output</p>
-                        <p className="mt-2 font-[family:var(--font-heading)] text-lg uppercase tracking-[0.14em] text-slate-900">Assistant synthesis</p>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <div className="jarvis-artifact-tabs">
-                          <button
-                            type="button"
-                            onClick={() => setSynthesisView("preview")}
-                            className={`jarvis-artifact-tab ${synthesisView === "preview" ? "is-active" : ""}`}
-                          >
-                            Read
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => setSynthesisView("jsx")}
-                            className={`jarvis-artifact-tab ${synthesisView === "jsx" ? "is-active" : ""}`}
-                          >
-                            artifact.jsx
-                          </button>
-                        </div>
-                        <span className="rounded-full border border-slate-300 bg-white px-3 py-1 text-[10px] uppercase tracking-[0.22em] text-slate-500">
-                          {busy ? "Streaming" : "Ready"}
+                {/* ── Platform outputs hero ── */}
+                <section className="rounded-[1.75rem] border border-[#ddd5c7] bg-[#fbf8f2] p-5 text-slate-900 shadow-[0_20px_60px_rgba(15,23,42,0.14)]">
+                  <div className="flex items-center justify-between gap-3 border-b border-slate-300/70 pb-4">
+                    <div>
+                      <p className="text-[11px] font-medium uppercase tracking-[0.28em] text-slate-500">Platform outputs · live renders</p>
+                      <p className="mt-2 font-[family:var(--font-heading)] text-lg uppercase tracking-[0.14em] text-slate-900">Generated channel deliverables</p>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      {previewCards.length > 0 && (
+                        <span className="flex items-center gap-1.5 rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1 text-[10px] uppercase tracking-[0.22em] text-emerald-700">
+                          <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+                          {previewCards.length} ready
                         </span>
+                      )}
+                      {busy && (
+                        <span className="flex items-center gap-1.5 rounded-full border border-amber-200 bg-amber-50 px-3 py-1 text-[10px] uppercase tracking-[0.22em] text-amber-700">
+                          <LoaderCircle className="h-3 w-3 animate-spin" />
+                          Generating
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                  {previewCards.length > 0 ? (
+                    <div className="mt-5 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+                      {previewCards.map((card, index) => (
+                        <PreviewCard
+                          key={`${card.platform}-${card.title}-${index}`}
+                          card={card}
+                          index={index}
+                          onOpen={() => setActivePreview({ card, index })}
+                        />
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="mt-5 flex min-h-56 items-center justify-center rounded-[1.25rem] border border-dashed border-slate-300 bg-white/70 px-6 text-center">
+                      <div>
+                        {busy && (
+                          <div className="mb-4 flex justify-center gap-2">
+                            <span className="h-2 w-2 animate-bounce rounded-full bg-slate-300" style={{ animationDelay: "0ms" }} />
+                            <span className="h-2 w-2 animate-bounce rounded-full bg-slate-300" style={{ animationDelay: "150ms" }} />
+                            <span className="h-2 w-2 animate-bounce rounded-full bg-slate-300" style={{ animationDelay: "300ms" }} />
+                          </div>
+                        )}
+                        <p className="text-sm uppercase tracking-[0.24em] text-slate-400">
+                          {busy
+                            ? "Specialists generating platform outputs now"
+                            : "Run a command to see LinkedIn, Instagram, email and more"}
+                        </p>
                       </div>
                     </div>
+                  )}
+                </section>
 
-                    {synthesisView === "jsx" ? (
-                      <div className="mt-5 space-y-4">
-                        <ArtifactCodePanel
-                          artifactId="main-artifact"
-                          title="Generated component"
-                          subtitle={routeMeta?.project_type ?? "jarvis-output"}
-                          filename={artifactFilename(routeMeta?.template_key ?? (command || "artifact"))}
-                          code={artifactJsx}
-                          copied={copiedArtifactId === "main-artifact"}
-                          onCopy={copyArtifact}
-                          onDownload={downloadArtifact}
-                        />
-
-                        {specialistArtifacts.length > 0 ? (
-                          <div className="grid gap-4 xl:grid-cols-2">
-                            {specialistArtifacts.map((artifact) => (
-                              <ArtifactCodePanel
-                                key={artifact.id}
-                                artifactId={artifact.id}
-                                title={artifact.label}
-                                subtitle={`${artifact.status} specialist artifact`}
-                                filename={artifact.filename}
-                                code={artifact.code}
-                                compact
-                                copied={copiedArtifactId === artifact.id}
-                                onCopy={copyArtifact}
-                                onDownload={downloadArtifact}
-                              />
-                            ))}
-                          </div>
-                        ) : null}
-                      </div>
-                    ) : responseText ? (
-                      <div className="mt-5 space-y-4">
-                        {responseText.split(/\n\n+/).map((chunk, index) => (
-                          <div key={`${chunk.slice(0, 32)}-${index}`} className="rounded-[1.2rem] border border-slate-200 bg-white px-4 py-4 shadow-[0_12px_24px_rgba(15,23,42,0.06)]">
-                            <p className="whitespace-pre-wrap text-[15px] leading-7 text-slate-700">{chunk}</p>
-                          </div>
-                        ))}
-                      </div>
-                    ) : (
-                      <div className="mt-5 flex min-h-56 items-center justify-center rounded-[1.25rem] border border-dashed border-slate-300 bg-white/70 px-6 text-center text-sm uppercase tracking-[0.24em] text-slate-400">
-                        Awaiting synthesis from the {selectedExecutiveMeta.label} lane
-                      </div>
-                    )}
-                  </section>
-
-                  <section className="rounded-[1.75rem] border border-[#ddd5c7] bg-[#fbf8f2] p-5 text-slate-900 shadow-[0_20px_60px_rgba(15,23,42,0.14)]">
-                    <div className="flex items-center justify-between gap-3 border-b border-slate-300/70 pb-4">
-                      <div>
-                        <p className="text-[11px] font-medium uppercase tracking-[0.28em] text-slate-500">Posted-look previews</p>
-                        <p className="mt-2 font-[family:var(--font-heading)] text-lg uppercase tracking-[0.14em] text-slate-900">Channel output cards</p>
+                {/* ── Synthesis ── */}
+                <section className="rounded-[1.75rem] border border-[#ddd5c7] bg-[#f7f3eb] p-5 text-slate-900 shadow-[0_20px_60px_rgba(15,23,42,0.18)]">
+                  <div className="flex items-center justify-between gap-3 border-b border-slate-300/70 pb-4">
+                    <div>
+                      <p className="text-[11px] font-medium uppercase tracking-[0.28em] text-slate-500">AI synthesis · full output</p>
+                      <p className="mt-2 font-[family:var(--font-heading)] text-lg uppercase tracking-[0.14em] text-slate-900">Executive briefing</p>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <div className="jarvis-artifact-tabs">
+                        <button
+                          type="button"
+                          onClick={() => setSynthesisView("preview")}
+                          className={`jarvis-artifact-tab ${synthesisView === "preview" ? "is-active" : ""}`}
+                        >
+                          Read
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setSynthesisView("jsx")}
+                          className={`jarvis-artifact-tab ${synthesisView === "jsx" ? "is-active" : ""}`}
+                        >
+                          artifact.jsx
+                        </button>
                       </div>
                       <span className="rounded-full border border-slate-300 bg-white px-3 py-1 text-[10px] uppercase tracking-[0.22em] text-slate-500">
-                        {previewCards.length} live
+                        {busy ? "Streaming" : "Ready"}
                       </span>
                     </div>
+                  </div>
 
-                    {previewCards.length > 0 ? (
-                      <div className="mt-5 grid gap-4 lg:grid-cols-2">
-                        {previewCards.map((card, index) => (
-                          <PreviewCard
-                            key={`${card.platform}-${card.title}-${index}`}
-                            card={card}
-                            index={index}
-                            onOpen={() => setActivePreview({ card, index })}
-                          />
-                        ))}
-                      </div>
-                    ) : (
-                      <div className="mt-5 flex min-h-56 items-center justify-center rounded-[1.25rem] border border-dashed border-slate-300 bg-white/70 px-6 text-center text-sm uppercase tracking-[0.24em] text-slate-400">
-                        Run LinkedIn, Instagram, Facebook, email, or newsletter creators to see realistic post previews here.
-                      </div>
-                    )}
-                  </section>
-                </div>
+                  {synthesisView === "jsx" ? (
+                    <div className="mt-5 space-y-4">
+                      <ArtifactCodePanel
+                        artifactId="main-artifact"
+                        title="Generated component"
+                        subtitle={routeMeta?.project_type ?? "jarvis-output"}
+                        filename={artifactFilename(routeMeta?.template_key ?? (command || "artifact"))}
+                        code={artifactJsx}
+                        copied={copiedArtifactId === "main-artifact"}
+                        onCopy={copyArtifact}
+                        onDownload={downloadArtifact}
+                      />
+
+                      {specialistArtifacts.length > 0 ? (
+                        <div className="grid gap-4 xl:grid-cols-2">
+                          {specialistArtifacts.map((artifact) => (
+                            <ArtifactCodePanel
+                              key={artifact.id}
+                              artifactId={artifact.id}
+                              title={artifact.label}
+                              subtitle={`${artifact.status} specialist artifact`}
+                              filename={artifact.filename}
+                              code={artifact.code}
+                              compact
+                              copied={copiedArtifactId === artifact.id}
+                              onCopy={copyArtifact}
+                              onDownload={downloadArtifact}
+                            />
+                          ))}
+                        </div>
+                      ) : null}
+                    </div>
+                  ) : responseText ? (
+                    <div className="mt-5 space-y-4">
+                      {responseText.split(/\n\n+/).map((chunk, index) => (
+                        <div key={`${chunk.slice(0, 32)}-${index}`} className="rounded-[1.2rem] border border-slate-200 bg-white px-4 py-4 shadow-[0_12px_24px_rgba(15,23,42,0.06)]">
+                          <p className="whitespace-pre-wrap text-[15px] leading-7 text-slate-700">{chunk}</p>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="mt-5 flex min-h-56 items-center justify-center rounded-[1.25rem] border border-dashed border-slate-300 bg-white/70 px-6 text-center text-sm uppercase tracking-[0.24em] text-slate-400">
+                      Awaiting synthesis from the {selectedExecutiveMeta.label} lane
+                    </div>
+                  )}
+                </section>
 
                 {errorMessage ? (
                   <div className="rounded-2xl border border-red-400/30 bg-red-500/10 px-4 py-3 text-sm text-red-200">
@@ -1883,57 +2172,177 @@ function CmoBranchTree({
   selectedKeys: SubAgentKey[];
 }) {
   const orderedKeys = selectedKeys.length > 0 ? selectedKeys : [];
+  const activeCount = orderedKeys.filter((k) => subAgents[k].status === "active").length;
+  const doneCount = orderedKeys.filter((k) => subAgents[k].status === "synthesized").length;
+  const errorCount = orderedKeys.filter((k) => subAgents[k].status === "error").length;
+  const queuedCount = orderedKeys.filter((k) => subAgents[k].status === "queued").length;
+  const progress =
+    orderedKeys.length > 0 ? Math.round(((doneCount + errorCount) / orderedKeys.length) * 100) : 0;
 
   return (
-    <section className="jarvis-branch-tree rounded-[1.75rem] border border-white/10 bg-black/28 p-5 sm:p-6">
-      <div className="flex flex-col items-center gap-3 text-center">
-        <div className="jarvis-branch-root">
-          <p className="font-[family:var(--font-heading)] text-sm uppercase tracking-[0.32em] text-[var(--jarvis-cyan)]">
-            {rootLabel} Core
-          </p>
-          <p className="mt-2 text-[11px] uppercase tracking-[0.24em] text-white/38">Progressive specialist chain</p>
+    <section className="overflow-hidden rounded-[1.75rem] border border-white/10 bg-black/38 shadow-[0_0_80px_rgba(86,255,241,0.04)]">
+      {/* Mission header */}
+      <div className="relative border-b border-white/8 bg-[linear-gradient(135deg,rgba(86,255,241,0.06),transparent_60%)] px-5 py-4 sm:px-6">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+          <div>
+            <div className="flex items-center gap-2.5">
+              {activeCount > 0 && (
+                <span className="relative flex h-2.5 w-2.5">
+                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[var(--jarvis-cyan)] opacity-60" />
+                  <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-[var(--jarvis-cyan)]" />
+                </span>
+              )}
+              <p className="font-[family:var(--font-heading)] text-xs uppercase tracking-[0.38em] text-[var(--jarvis-cyan)]">
+                {activeCount > 0
+                  ? `${activeCount} agent${activeCount > 1 ? "s" : ""} running in parallel`
+                  : doneCount === orderedKeys.length && orderedKeys.length > 0
+                    ? "Mission complete"
+                    : `${rootLabel} core`}
+              </p>
+            </div>
+            <p className="mt-1.5 text-[13px] text-white/50">
+              {orderedKeys.length} specialists deployed
+              {activeCount > 0
+                ? ` · ${activeCount} generating simultaneously`
+                : doneCount > 0
+                  ? ` · ${doneCount} outputs delivered`
+                  : ""}
+            </p>
+          </div>
+          <div className="flex flex-wrap items-center gap-2">
+            {activeCount > 0 && (
+              <span className="flex items-center gap-1.5 rounded-full border border-[var(--jarvis-cyan)]/30 bg-[var(--jarvis-cyan)]/10 px-3 py-1.5 text-[10px] uppercase tracking-[0.22em] text-[var(--jarvis-cyan)]">
+                <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-[var(--jarvis-cyan)]" />
+                {activeCount} active
+              </span>
+            )}
+            {doneCount > 0 && (
+              <span className="flex items-center gap-1.5 rounded-full border border-emerald-500/25 bg-emerald-500/10 px-3 py-1.5 text-[10px] uppercase tracking-[0.22em] text-emerald-400">
+                <Check className="h-3 w-3" />
+                {doneCount} done
+              </span>
+            )}
+            {queuedCount > 0 && (
+              <span className="rounded-full border border-white/10 bg-white/[0.04] px-3 py-1.5 text-[10px] uppercase tracking-[0.22em] text-white/38">
+                {queuedCount} queued
+              </span>
+            )}
+          </div>
         </div>
-        <div className="jarvis-branch-stem" aria-hidden />
+        {orderedKeys.length > 0 && (
+          <div className="mt-4">
+            <div className="mb-1.5 flex items-center justify-between text-[10px] uppercase tracking-[0.2em] text-white/30">
+              <span>Mission progress</span>
+              <span>{progress}%</span>
+            </div>
+            <div className="h-[3px] w-full overflow-hidden rounded-full bg-white/8">
+              <div
+                className="h-full rounded-full bg-gradient-to-r from-[var(--jarvis-cyan)] to-emerald-400 transition-all duration-700 ease-out"
+                style={{ width: `${Math.max(progress, activeCount > 0 ? 4 : 0)}%` }}
+              />
+            </div>
+          </div>
+        )}
       </div>
 
+      {/* Agent grid */}
       {orderedKeys.length > 0 ? (
-        <div className="relative mt-3 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-          <div className="jarvis-branch-rail hidden xl:block" aria-hidden />
-          {orderedKeys.map((key, index) => {
-            const meta = SUB_AGENT_META[key];
-            const state = subAgents[key];
+        <div className="p-4 sm:p-5">
+          <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+            {orderedKeys.map((key, index) => {
+              const meta = SUB_AGENT_META[key];
+              const state = subAgents[key];
+              const isActive = state.status === "active";
+              const isDone = state.status === "synthesized";
+              const isError = state.status === "error";
+              const preview =
+                isDone && state.detail && state.detail.length > 10
+                  ? (jsonFirstPreview(state.detail) ??
+                    state.detail
+                      .replace(/^[A-Z][A-Za-z ]+:\n/gm, "")
+                      .trim()
+                      .slice(0, 100)
+                      .replace(/\n/g, " "))
+                  : null;
 
-            return (
-              <article
-                key={key}
-                className={`jarvis-executive-reveal jarvis-branch-card is-${state.status}`}
-                style={{ animationDelay: `${index * 100}ms` }}
-              >
-                <div className="jarvis-branch-connector" aria-hidden />
-                <div className="flex items-start justify-between gap-3">
-                  <div className="flex items-start gap-3">
-                    <AgentGlyph agentKey={key} />
-                    <div>
-                      <p className="text-[10px] uppercase tracking-[0.28em] text-[var(--jarvis-cyan)]/78">{meta.branch}</p>
-                      <p className="mt-2 font-[family:var(--font-heading)] text-sm uppercase tracking-[0.22em] text-white/82">
-                        {meta.label}
-                      </p>
+              return (
+                <article
+                  key={key}
+                  className={`jarvis-executive-reveal relative overflow-hidden rounded-[1.35rem] border p-3.5 transition-all duration-500 ${
+                    isActive
+                      ? "border-[var(--jarvis-cyan)]/35 bg-[rgba(86,255,241,0.05)] shadow-[0_0_28px_rgba(86,255,241,0.08),inset_0_0_0_1px_rgba(86,255,241,0.06)]"
+                      : isDone
+                        ? "border-emerald-500/25 bg-emerald-950/20"
+                        : isError
+                          ? "border-red-500/18 bg-red-950/15"
+                          : "border-white/7 bg-white/[0.02]"
+                  }`}
+                  style={{ animationDelay: `${index * 55}ms` }}
+                >
+                  {isActive && (
+                    <div className="pointer-events-none absolute inset-0 animate-pulse bg-[radial-gradient(ellipse_at_top_left,rgba(86,255,241,0.07),transparent_65%)]" />
+                  )}
+                  <div className="relative flex items-start justify-between gap-2">
+                    <div className="flex items-center gap-2.5">
+                      <AgentGlyph agentKey={key} />
+                      <div>
+                        <p className="text-[9px] uppercase tracking-[0.24em] text-white/35">{meta.branch}</p>
+                        <p className="mt-0.5 text-[11px] font-semibold uppercase tracking-[0.16em] text-white/75">{meta.shortLabel}</p>
+                      </div>
                     </div>
+                    <span
+                      className={`shrink-0 rounded-full px-2 py-0.5 text-[9px] uppercase tracking-[0.18em] ${
+                        isActive
+                          ? "bg-[var(--jarvis-cyan)]/15 text-[var(--jarvis-cyan)]"
+                          : isDone
+                            ? "bg-emerald-500/15 text-emerald-400"
+                            : isError
+                              ? "bg-red-500/12 text-red-400"
+                              : "bg-white/6 text-white/30"
+                      }`}
+                    >
+                      {isDone ? "✓ done" : state.status}
+                    </span>
                   </div>
-                  <span className={`jarvis-branch-status is-${state.status}`} aria-label={state.status} />
-                </div>
-                <div className="mt-4 flex items-center gap-2 text-[10px] uppercase tracking-[0.24em] text-white/34">
-                  <span>{meta.shortLabel}</span>
-                  <span className="h-px flex-1 bg-white/10" aria-hidden />
-                  <span>{state.status}</span>
-                </div>
-                <p className="mt-4 text-sm leading-6 text-white/58">{state.detail}</p>
-              </article>
-            );
-          })}
+
+                  <div className="relative mt-3">
+                    {isActive ? (
+                      <div className="flex items-center gap-2">
+                        <div className="flex gap-1">
+                          <span
+                            className="h-1.5 w-1.5 animate-bounce rounded-full bg-[var(--jarvis-cyan)]/70"
+                            style={{ animationDelay: "0ms" }}
+                          />
+                          <span
+                            className="h-1.5 w-1.5 animate-bounce rounded-full bg-[var(--jarvis-cyan)]/70"
+                            style={{ animationDelay: "150ms" }}
+                          />
+                          <span
+                            className="h-1.5 w-1.5 animate-bounce rounded-full bg-[var(--jarvis-cyan)]/70"
+                            style={{ animationDelay: "300ms" }}
+                          />
+                        </div>
+                        <p className="text-[10px] uppercase tracking-[0.18em] text-[var(--jarvis-cyan)]/65">Generating</p>
+                      </div>
+                    ) : preview ? (
+                      <p className="line-clamp-2 text-[11px] leading-[1.65] text-white/48">{preview}</p>
+                    ) : (
+                      <p className="text-[10px] uppercase tracking-[0.16em] text-white/24">
+                        {state.status === "queued"
+                          ? "In queue"
+                          : state.status === "error"
+                            ? "Skipped"
+                            : "Standby"}
+                      </p>
+                    )}
+                  </div>
+                </article>
+              );
+            })}
+          </div>
         </div>
       ) : (
-        <div className="mt-3 flex min-h-32 items-center justify-center rounded-[1.35rem] border border-dashed border-white/10 bg-black/18 text-center text-[11px] uppercase tracking-[0.24em] text-white/34">
+        <div className="flex min-h-32 items-center justify-center p-8 text-center text-[11px] uppercase tracking-[0.24em] text-white/26">
           Resolving specialist mix
         </div>
       )}
@@ -1992,6 +2401,14 @@ function AgentGlyph({ agentKey }: { agentKey: SubAgentKey }) {
     offers: "OF",
     brand_voice: "BV",
     landing_page: "LP",
+    landing_page_architect: "PA",
+    linkedin_carousel: "LC",
+    dm_automation: "DM",
+    squeeze_page: "SQ",
+    lead_magnet: "LM",
+    instagram_reels: "IR",
+    instagram_stories: "IS",
+    facebook_ads: "FA",
     email_writer: "EM",
     email_sequence: "ES",
     newsletter_writer: "NW",
@@ -2049,6 +2466,27 @@ function PreviewCard({
   }
   if (card.platform === "Landing Page") {
     return <LandingPagePreview card={card} index={index} mode={mode} onOpen={onOpen} />;
+  }
+  if (card.platform === "Carousel") {
+    return <CarouselPreview card={card} index={index} mode={mode} onOpen={onOpen} />;
+  }
+  if (card.platform === "DM Automation") {
+    return <DmAutomationPreview card={card} index={index} mode={mode} onOpen={onOpen} />;
+  }
+  if (card.platform === "Squeeze Page") {
+    return <SqueezePagePreview card={card} index={index} mode={mode} onOpen={onOpen} />;
+  }
+  if (card.platform === "Lead Magnet") {
+    return <LeadMagnetPreview card={card} index={index} mode={mode} onOpen={onOpen} />;
+  }
+  if (card.platform === "Reels") {
+    return <InstagramReelsPreview card={card} index={index} mode={mode} onOpen={onOpen} />;
+  }
+  if (card.platform === "Stories") {
+    return <InstagramStoriesPreview card={card} index={index} mode={mode} onOpen={onOpen} />;
+  }
+  if (card.platform === "Facebook Ads") {
+    return <FacebookAdsPreview card={card} index={index} mode={mode} onOpen={onOpen} />;
   }
   return <NewsletterPreview card={card} index={index} mode={mode} onOpen={onOpen} />;
 }
@@ -2179,6 +2617,82 @@ function PlatformMark({ platform }: { platform: PreviewCardData["platform"] }) {
     );
   }
 
+  if (platform === "Carousel") {
+    return (
+      <span className="jarvis-platform-mark is-linkedin" aria-label="LinkedIn Carousel">
+        <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+          <rect x="3" y="5" width="12" height="14" rx="2" />
+          <path d="M15 7h3a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-3" />
+          <path d="M1 9v6" />
+        </svg>
+      </span>
+    );
+  }
+
+  if (platform === "DM Automation") {
+    return (
+      <span className="jarvis-platform-mark" style={{ background: "#7c3aed", color: "white" }} aria-label="DM Automation">
+        <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+        </svg>
+      </span>
+    );
+  }
+
+  if (platform === "Squeeze Page") {
+    return (
+      <span className="jarvis-platform-mark" style={{ background: "#059669", color: "white" }} aria-label="Squeeze Page">
+        <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M4 4h16v4H4zM4 10h10M4 14h8M10 18l4-4 4 4" />
+        </svg>
+      </span>
+    );
+  }
+
+  if (platform === "Lead Magnet") {
+    return (
+      <span className="jarvis-platform-mark" style={{ background: "#d97706", color: "white" }} aria-label="Lead Magnet">
+        <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M12 2a3 3 0 0 1 3 3v1h2a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h2V5a3 3 0 0 1 3-3z" />
+          <path d="M9 12h6M9 16h4" />
+        </svg>
+      </span>
+    );
+  }
+
+  if (platform === "Reels") {
+    return (
+      <span className="jarvis-platform-mark" style={{ background: "linear-gradient(135deg,#f58529,#dd2a7b)", color: "white" }} aria-label="Instagram Reels">
+        <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+          <rect x="3" y="3" width="18" height="18" rx="4" />
+          <circle cx="12" cy="12" r="3" />
+          <path d="M3 8h18M8 3v5M16 3v5" />
+        </svg>
+      </span>
+    );
+  }
+
+  if (platform === "Stories") {
+    return (
+      <span className="jarvis-platform-mark" style={{ background: "linear-gradient(135deg,#dd2a7b,#515bd4)", color: "white" }} aria-label="Instagram Stories">
+        <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+          <rect x="6" y="2" width="12" height="20" rx="3" />
+          <path d="M9 7h6M9 11h6M9 15h3" />
+        </svg>
+      </span>
+    );
+  }
+
+  if (platform === "Facebook Ads") {
+    return (
+      <span className="jarvis-platform-mark" style={{ background: "#0866ff", color: "white" }} aria-label="Facebook Ads">
+        <svg viewBox="0 0 24 24" className="h-4 w-4 fill-current">
+          <path d="M13.5 21v-7h2.4l.6-3h-3V9.1c0-.87.28-1.46 1.54-1.46H16.7V5.01c-.3-.04-1.33-.11-2.53-.11-2.5 0-4.21 1.52-4.21 4.33V11H7.5v3H10v7Z" />
+        </svg>
+      </span>
+    );
+  }
+
   return (
     <span className="jarvis-platform-mark is-newsletter" aria-label="Newsletter">
       <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
@@ -2227,9 +2741,9 @@ function LinkedInPreview({ card, index, mode, onOpen }: { card: PreviewCardData;
             <span className="jarvis-preview-status">{previewStatus(card, "Live post")}</span>
           </div>
 
-          <div className="mt-4 space-y-3 text-sm leading-6 text-slate-700">
-            <p className="font-semibold text-slate-900">{card.title}</p>
-            <p className="line-clamp-7 whitespace-pre-wrap">{card.body}</p>
+          <div className="mt-4 space-y-3">
+            <p className="text-[16px] font-bold leading-7 text-slate-900">{card.title}</p>
+            <p className="line-clamp-8 text-[14px] leading-7 text-slate-600 whitespace-pre-wrap">{card.body}</p>
           </div>
 
           <div className="mt-4 overflow-hidden rounded-[1.2rem] border border-[#d8e1eb] bg-[#f6f9fc]">
@@ -2706,6 +3220,304 @@ function LandingPagePreview({ card, index, mode, onOpen }: { card: PreviewCardDa
               ))}
             </div>
             <div className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-xs uppercase tracking-[0.18em] text-slate-500">{card.footer}</div>
+          </div>
+        </div>
+      </div>
+    </article>
+  );
+}
+
+function CarouselPreview({ card, index, mode, onOpen }: { card: PreviewCardData; index: number; mode: PreviewMode; onOpen?: () => void }) {
+  const slideLabels = card.visual ? card.visual.split("·").map((s) => s.trim()) : [];
+  const slideCount = parseInt(slideLabels[0] ?? "6", 10) || 6;
+  const intent = slideLabels[1] ?? "Educating";
+  return (
+    <article className={`${previewCardClass(card, mode)} bg-[#f0f4ff]`} style={previewStyle(mode, index)}>
+      <PreviewExpandButton onOpen={mode === "grid" ? onOpen : undefined} />
+      <div className="jarvis-preview-accent bg-[linear-gradient(135deg,#0a66c2,#1d9bf0,#7dd3fc)]" />
+      <div className="p-4">
+        <div className="overflow-hidden rounded-[1.4rem] border border-blue-200 bg-white shadow-[0_18px_42px_rgba(10,102,194,0.1)]">
+          <div className="bg-gradient-to-r from-[#0a66c2] to-[#1d9bf0] px-5 py-4">
+            <div className="flex items-center justify-between gap-3">
+              <div className="flex items-center gap-3">
+                <PlatformMark platform="Carousel" />
+                <div>
+                  <p className="text-[10px] uppercase tracking-[0.22em] text-white/72">LinkedIn Carousel</p>
+                  <p className="mt-1 text-[13px] font-semibold text-white">{intent} · {slideCount} slides</p>
+                </div>
+              </div>
+              <span className="rounded-full border border-white/20 bg-white/10 px-3 py-1 text-[10px] uppercase tracking-[0.16em] text-white/82">Swipe →</span>
+            </div>
+          </div>
+          <div className="flex gap-0 overflow-hidden">
+            {Array.from({ length: Math.min(slideCount, 4) }).map((_, i) => (
+              <div key={i} className={`relative flex min-h-[120px] flex-1 flex-col justify-between border-r border-blue-100 px-3 py-3 last:border-r-0 ${i === 0 ? "bg-[#0a66c2] text-white" : "bg-white text-slate-700"}`}>
+                <span className={`text-[9px] font-semibold uppercase tracking-[0.18em] ${i === 0 ? "text-white/60" : "text-slate-400"}`}>
+                  {i === 0 ? "Cover" : `Slide ${i + 1}`}
+                </span>
+                {i === 0 ? (
+                  <p className="mt-2 text-[12px] font-bold leading-tight text-white line-clamp-3">{card.title}</p>
+                ) : (
+                  <div className="mt-2 space-y-1">
+                    <div className="h-2 w-full rounded-full bg-slate-200" />
+                    <div className="h-2 w-4/5 rounded-full bg-slate-100" />
+                    <div className="h-2 w-3/5 rounded-full bg-slate-100" />
+                  </div>
+                )}
+                <span className={`mt-2 text-[8px] uppercase tracking-[0.14em] ${i === 0 ? "text-white/50" : "text-slate-300"}`}>{i + 1}/{slideCount}</span>
+              </div>
+            ))}
+          </div>
+          <div className="border-t border-blue-100 px-5 py-3 text-[11px] text-slate-500">{card.footer}</div>
+        </div>
+      </div>
+    </article>
+  );
+}
+
+function DmAutomationPreview({ card, index, mode, onOpen }: { card: PreviewCardData; index: number; mode: PreviewMode; onOpen?: () => void }) {
+  const lines = card.body.split("\n").filter(Boolean);
+  return (
+    <article className={`${previewCardClass(card, mode)} bg-[#1a1a2e]`} style={previewStyle(mode, index)}>
+      <PreviewExpandButton onOpen={mode === "grid" ? onOpen : undefined} />
+      <div className="jarvis-preview-accent bg-[linear-gradient(135deg,#7c3aed,#a855f7,#e879f9)]" />
+      <div className="p-4">
+        <div className="overflow-hidden rounded-[1.4rem] border border-purple-500/30 bg-[#0d0d1a] shadow-[0_18px_42px_rgba(124,58,237,0.2)]">
+          <div className="flex items-center justify-between border-b border-purple-500/20 bg-[#111128] px-5 py-4">
+            <div className="flex items-center gap-3">
+              <PlatformMark platform="DM Automation" />
+              <div>
+                <p className="text-[10px] uppercase tracking-[0.22em] text-purple-400/80">DM Sequence</p>
+                <p className="mt-1 text-[13px] font-semibold text-white">{card.title}</p>
+              </div>
+            </div>
+            <span className="rounded-full border border-purple-500/30 bg-purple-500/10 px-3 py-1 text-[10px] uppercase tracking-[0.16em] text-purple-300">Automated</span>
+          </div>
+          <div className="space-y-3 p-5">
+            {lines.slice(0, 3).map((line, i) => (
+              <div key={i} className={`flex gap-3 ${i % 2 === 0 ? "flex-row" : "flex-row-reverse"}`}>
+                <div className="mt-1 h-6 w-6 shrink-0 rounded-full bg-gradient-to-br from-purple-500 to-indigo-500" />
+                <div className={`max-w-[75%] rounded-2xl px-4 py-3 text-[12px] leading-5 ${i % 2 === 0 ? "rounded-tl-sm bg-[#1e1e3a] text-slate-300" : "rounded-tr-sm bg-purple-600 text-white"}`}>
+                  {line.slice(0, 120)}
+                </div>
+              </div>
+            ))}
+          </div>
+          <div className="border-t border-purple-500/20 px-5 py-3 text-[11px] text-purple-400/70">{card.footer}</div>
+        </div>
+      </div>
+    </article>
+  );
+}
+
+function SqueezePagePreview({ card, index, mode, onOpen }: { card: PreviewCardData; index: number; mode: PreviewMode; onOpen?: () => void }) {
+  const lines = card.body.split("\n").filter(Boolean);
+  const subheadline = lines[0] ?? "";
+  const benefits = lines.slice(1);
+  return (
+    <article className={`${previewCardClass(card, mode)} bg-[#f0faf5]`} style={previewStyle(mode, index)}>
+      <PreviewExpandButton onOpen={mode === "grid" ? onOpen : undefined} />
+      <div className="jarvis-preview-accent bg-[linear-gradient(135deg,#059669,#10b981,#6ee7b7)]" />
+      <div className="p-4">
+        <div className="overflow-hidden rounded-[1.4rem] border border-emerald-200 bg-white shadow-[0_18px_42px_rgba(5,150,105,0.1)]">
+          <div className="bg-gradient-to-br from-[#059669] to-[#10b981] px-6 py-8 text-center text-white">
+            <p className="text-[10px] uppercase tracking-[0.24em] text-white/70">Squeeze Page</p>
+            <h3 className="mt-3 font-[family:var(--font-heading)] text-xl font-bold leading-tight uppercase">{card.title}</h3>
+            {subheadline && <p className="mt-2 text-[13px] text-white/80">{subheadline}</p>}
+          </div>
+          <div className="px-6 py-4">
+            {benefits.length > 0 && (
+              <ul className="space-y-2">
+                {benefits.slice(0, 4).map((b, i) => (
+                  <li key={i} className="flex items-start gap-2 text-[13px] text-slate-700">
+                    <Check className="mt-0.5 h-3.5 w-3.5 shrink-0 text-emerald-500" />
+                    {b}
+                  </li>
+                ))}
+              </ul>
+            )}
+            <button type="button" className="mt-5 w-full rounded-full bg-gradient-to-r from-[#059669] to-[#10b981] py-3 text-[12px] font-bold uppercase tracking-[0.2em] text-white shadow-[0_8px_20px_rgba(5,150,105,0.3)]">
+              {card.footer}
+            </button>
+          </div>
+        </div>
+      </div>
+    </article>
+  );
+}
+
+function LeadMagnetPreview({ card, index, mode, onOpen }: { card: PreviewCardData; index: number; mode: PreviewMode; onOpen?: () => void }) {
+  const lines = card.body.split("\n").filter(Boolean);
+  const subtitle = lines[0] ?? "";
+  const tocItems = lines.slice(1);
+  return (
+    <article className={`${previewCardClass(card, mode)} bg-[#fffbf0]`} style={previewStyle(mode, index)}>
+      <PreviewExpandButton onOpen={mode === "grid" ? onOpen : undefined} />
+      <div className="jarvis-preview-accent bg-[linear-gradient(135deg,#d97706,#f59e0b,#fde68a)]" />
+      <div className="p-4">
+        <div className="overflow-hidden rounded-[1.4rem] border border-amber-200 bg-white shadow-[0_18px_42px_rgba(217,119,6,0.1)]">
+          <div className="relative bg-gradient-to-br from-[#92400e] to-[#d97706] px-6 py-6">
+            <div className="absolute right-4 top-4 rounded-full border border-white/20 bg-white/10 px-3 py-1 text-[9px] uppercase tracking-[0.18em] text-white/80">{card.visual ?? "guide"}</div>
+            <p className="text-[10px] uppercase tracking-[0.24em] text-amber-200/80">Lead Magnet</p>
+            <h3 className="mt-2 font-[family:var(--font-heading)] text-lg font-bold uppercase leading-tight text-white">{card.title}</h3>
+            {subtitle && <p className="mt-1 text-[12px] text-amber-100/80">{subtitle}</p>}
+          </div>
+          <div className="px-5 py-4">
+            {tocItems.length > 0 && (
+              <div className="space-y-2">
+                <p className="text-[10px] uppercase tracking-[0.18em] text-slate-400">What&apos;s inside</p>
+                {tocItems.slice(0, 4).map((item, i) => (
+                  <div key={i} className="flex items-center gap-2 rounded-[0.7rem] border border-amber-100 bg-amber-50 px-3 py-2 text-[12px] text-slate-700">
+                    <span className="shrink-0 text-amber-500">◆</span>
+                    {item.replace(/^·\s*/, "")}
+                  </div>
+                ))}
+              </div>
+            )}
+            <div className="mt-4 rounded-2xl border border-amber-200 bg-amber-50 px-4 py-2.5 text-[11px] uppercase tracking-[0.16em] text-amber-700">{card.footer}</div>
+          </div>
+        </div>
+      </div>
+    </article>
+  );
+}
+
+function InstagramReelsPreview({ card, index, mode, onOpen }: { card: PreviewCardData; index: number; mode: PreviewMode; onOpen?: () => void }) {
+  const lines = card.body.split("\n").filter(Boolean);
+  const intent = lines[0] ?? "Reel";
+  const hookSpoken = lines[1] ?? "";
+  const script = lines.slice(2).join(" ");
+  const stats = card.visual ? card.visual.split("·").map((s) => s.trim()) : [];
+  return (
+    <article className={`${previewCardClass(card, mode)} bg-[#0a0a0a]`} style={previewStyle(mode, index)}>
+      <PreviewExpandButton onOpen={mode === "grid" ? onOpen : undefined} />
+      <div className="jarvis-preview-accent bg-[linear-gradient(135deg,#f58529,#dd2a7b,#8134af)]" />
+      <div className="p-3">
+        <div className="overflow-hidden rounded-[1.4rem] border border-white/10 bg-[#111] shadow-[0_20px_48px_rgba(221,42,123,0.18)]">
+          {/* Phone-like vertical frame */}
+          <div className="relative mx-auto w-full max-w-[220px]">
+            <div className="relative aspect-[9/16] max-h-[260px] overflow-hidden rounded-[1.1rem] bg-gradient-to-b from-[#1a0a2e] via-[#2d1b4e] to-[#0a0a1a]">
+              {/* Reel content overlay */}
+              <div className="absolute inset-0 flex flex-col justify-between p-4">
+                <div className="flex items-start justify-between">
+                  <span className="rounded-full border border-white/20 bg-black/40 px-2 py-0.5 text-[9px] uppercase tracking-[0.16em] text-white/80 backdrop-blur-sm">Reel</span>
+                  <span className="rounded-full border border-pink-500/40 bg-pink-500/20 px-2 py-0.5 text-[9px] uppercase tracking-[0.14em] text-pink-300">{intent}</span>
+                </div>
+                {/* Hook text overlay */}
+                <div className="space-y-2">
+                  <p className="text-[13px] font-bold leading-snug text-white drop-shadow-lg">{card.title}</p>
+                  {hookSpoken && <p className="text-[10px] leading-snug text-white/70">{hookSpoken.slice(0, 80)}</p>}
+                  <div className="flex items-center gap-2 border-t border-white/10 pt-2 text-[9px] text-white/50">
+                    {stats[0] && <span>{stats[0]}</span>}
+                    {stats[1] && <span>· {stats[1]}</span>}
+                  </div>
+                </div>
+              </div>
+              {/* Side action bar */}
+              <div className="absolute bottom-4 right-2 flex flex-col items-center gap-3 text-white/60">
+                <svg viewBox="0 0 24 24" className="h-5 w-5 fill-current" aria-hidden><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+                <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8M16 6l-4-4-4 4M12 2v13"/></svg>
+              </div>
+            </div>
+          </div>
+          {/* Script preview */}
+          <div className="px-4 py-3">
+            <p className="text-[10px] uppercase tracking-[0.18em] text-slate-500">Script preview</p>
+            <p className="mt-1 line-clamp-3 text-[12px] leading-5 text-slate-400">{script || card.body}</p>
+            <div className="mt-3 rounded-2xl border border-pink-500/20 bg-pink-500/5 px-3 py-2 text-[11px] text-pink-400">{card.footer}</div>
+          </div>
+        </div>
+      </div>
+    </article>
+  );
+}
+
+function InstagramStoriesPreview({ card, index, mode, onOpen }: { card: PreviewCardData; index: number; mode: PreviewMode; onOpen?: () => void }) {
+  const lines = card.body.split("\n").filter(Boolean);
+  const seqType = lines[0] ?? "Sequence";
+  const frames = lines.slice(1);
+  const stats = card.visual ? card.visual.split("·").map((s) => s.trim()) : [];
+  const frameCount = parseInt(stats[0] ?? "5", 10) || 5;
+  return (
+    <article className={`${previewCardClass(card, mode)} bg-[#1a0a2e]`} style={previewStyle(mode, index)}>
+      <PreviewExpandButton onOpen={mode === "grid" ? onOpen : undefined} />
+      <div className="jarvis-preview-accent bg-[linear-gradient(135deg,#f58529,#dd2a7b,#515bd4)]" />
+      <div className="p-4">
+        <div className="overflow-hidden rounded-[1.4rem] border border-white/10 bg-[#0f0a1a] shadow-[0_20px_48px_rgba(81,91,212,0.2)]">
+          <div className="border-b border-white/8 px-5 py-4">
+            <div className="flex items-center justify-between gap-3">
+              <div className="flex items-center gap-3">
+                <PlatformMark platform="Stories" />
+                <div>
+                  <p className="text-[10px] uppercase tracking-[0.22em] text-purple-400/80">Story Sequence</p>
+                  <p className="mt-1 text-[13px] font-semibold text-white">{card.title}</p>
+                </div>
+              </div>
+              <span className="rounded-full border border-purple-500/30 bg-purple-500/10 px-3 py-1 text-[10px] text-purple-300">{seqType}</span>
+            </div>
+          </div>
+          {/* Story frames strip */}
+          <div className="flex gap-2 overflow-x-auto px-5 py-4">
+            {Array.from({ length: Math.min(frameCount, 5) }).map((_, i) => (
+              <div key={i} className={`relative shrink-0 aspect-[9/16] w-[58px] overflow-hidden rounded-xl border ${i === 0 ? "border-pink-500/50 bg-gradient-to-b from-[#dd2a7b]/30 to-[#515bd4]/20" : "border-white/10 bg-white/5"}`}>
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <span className="text-[8px] text-white/40">{i + 1}</span>
+                </div>
+                {i === 0 && frames[0] && (
+                  <div className="absolute inset-x-1 bottom-2 text-[7px] font-medium leading-tight text-white/80">{frames[0].slice(0, 25)}</div>
+                )}
+              </div>
+            ))}
+          </div>
+          <div className="space-y-2 px-5 pb-4">
+            {frames.slice(0, 3).map((frame, i) => (
+              <div key={i} className="flex items-center gap-2 text-[11px] text-slate-400">
+                <span className="shrink-0 text-purple-400">→</span>
+                {frame.replace(" → ", " ")}
+              </div>
+            ))}
+            <div className="mt-2 rounded-2xl border border-purple-500/20 bg-purple-500/5 px-3 py-2 text-[11px] text-purple-300">{card.footer}</div>
+          </div>
+        </div>
+      </div>
+    </article>
+  );
+}
+
+function FacebookAdsPreview({ card, index, mode, onOpen }: { card: PreviewCardData; index: number; mode: PreviewMode; onOpen?: () => void }) {
+  const stats = card.visual ? card.visual.split("·").map((s) => s.trim()) : [];
+  const adCount = stats[0] ?? "3 ads";
+  const objection = stats[1] ?? "";
+  return (
+    <article className={`${previewCardClass(card, mode)} bg-[#f0f2f5]`} style={previewStyle(mode, index)}>
+      <PreviewExpandButton onOpen={mode === "grid" ? onOpen : undefined} />
+      <div className="jarvis-preview-accent bg-[linear-gradient(135deg,#0866ff,#1877f2,#42a5f5)]" />
+      <div className="p-3">
+        <div className="overflow-hidden rounded-[1.4rem] border border-blue-200 bg-white shadow-[0_18px_42px_rgba(8,102,255,0.12)]">
+          {/* Facebook ad frame header */}
+          <div className="flex items-center gap-3 border-b border-slate-100 px-5 py-3">
+            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#0866ff] text-white text-xs font-bold">f</div>
+            <div className="flex-1">
+              <p className="text-[12px] font-semibold text-slate-800">Your Brand</p>
+              <p className="text-[10px] text-slate-400">Sponsored · <span className="text-blue-500">🌐</span></p>
+            </div>
+            <span className="rounded-full border border-blue-200 bg-blue-50 px-3 py-1 text-[10px] uppercase tracking-[0.16em] text-blue-600">{adCount}</span>
+          </div>
+          {/* Primary text */}
+          <div className="px-5 py-4">
+            <p className="line-clamp-4 text-[13px] leading-6 text-slate-700">{card.body}</p>
+          </div>
+          {/* Creative area */}
+          <div className={`relative bg-gradient-to-br ${card.accent} px-5 py-5`}>
+            <p className="text-[11px] uppercase tracking-[0.18em] text-white/70">Ad Creative</p>
+            <p className="mt-2 text-lg font-bold leading-tight text-white">{card.title}</p>
+            {objection && <p className="mt-1 text-[11px] text-white/70">Addresses: {objection}</p>}
+          </div>
+          {/* CTA row */}
+          <div className="flex items-center justify-between gap-3 border-t border-slate-100 px-5 py-3">
+            <p className="text-[11px] text-slate-400">{card.footer}</p>
+            <button type="button" className="rounded-md bg-[#0866ff] px-4 py-2 text-[11px] font-semibold text-white">{card.footer}</button>
           </div>
         </div>
       </div>

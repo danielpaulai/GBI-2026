@@ -13,7 +13,7 @@ def _build_specialist_agent(model, *, name: str, prompt: str, tools=None):
     )
 
 
-def build_content_agent(model: ChatAnthropic):
+def build_content_agent(model):
     return _build_specialist_agent(
         model,
         name="content",
@@ -27,7 +27,7 @@ def build_content_agent(model: ChatAnthropic):
     )
 
 
-def build_campaigns_agent(model: ChatAnthropic):
+def build_campaigns_agent(model):
     return _build_specialist_agent(
         model,
         name="campaigns",
@@ -50,7 +50,7 @@ Constraints:
     )
 
 
-def build_offers_agent(model: ChatAnthropic):
+def build_offers_agent(model):
     return _build_specialist_agent(
         model,
         name="offers",
@@ -73,7 +73,7 @@ Constraints:
     )
 
 
-def build_analytics_agent(model: ChatAnthropic):
+def build_analytics_agent(model):
     return _build_specialist_agent(
         model,
         name="analytics",
@@ -199,4 +199,68 @@ def build_newsletter_writer_agent(model):
         model,
         name="newsletter_writer",
         prompt=load_prompt("newsletter_writer_system"),
+    )
+
+
+def build_linkedin_carousel_agent(model):
+    return _build_specialist_agent(
+        model,
+        name="linkedin_carousel",
+        prompt=load_prompt("linkedin_carousel_system"),
+    )
+
+
+def build_landing_page_architect_agent(model):
+    return _build_specialist_agent(
+        model,
+        name="landing_page_architect",
+        prompt=load_prompt("landing_page_architect_system"),
+    )
+
+
+def build_dm_automation_agent(model):
+    return _build_specialist_agent(
+        model,
+        name="dm_automation",
+        prompt=load_prompt("dm_automation_system"),
+    )
+
+
+def build_squeeze_page_agent(model):
+    return _build_specialist_agent(
+        model,
+        name="squeeze_page",
+        prompt=load_prompt("squeeze_page_system"),
+    )
+
+
+def build_lead_magnet_agent(model):
+    return _build_specialist_agent(
+        model,
+        name="lead_magnet",
+        prompt=load_prompt("lead_magnet_system"),
+    )
+
+
+def build_instagram_reels_agent(model):
+    return _build_specialist_agent(
+        model,
+        name="instagram_reels",
+        prompt=load_prompt("instagram_reels_system"),
+    )
+
+
+def build_instagram_stories_agent(model):
+    return _build_specialist_agent(
+        model,
+        name="instagram_stories",
+        prompt=load_prompt("instagram_stories_system"),
+    )
+
+
+def build_facebook_ads_agent(model):
+    return _build_specialist_agent(
+        model,
+        name="facebook_ads",
+        prompt=load_prompt("facebook_ads_system"),
     )
