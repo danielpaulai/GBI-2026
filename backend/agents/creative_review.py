@@ -138,10 +138,12 @@ OUTPUT FORMAT (return ONLY this JSON, no preamble, no markdown fences):
   "revision_directives": "If verdict=revise: exactly what the writer must change. Be surgical. Do not rewrite. Direct the writer."
 }}
 
-VERDICT RULES:
+VERDICT RULES (apply these exactly — do not deviate):
 - "ship" = weighted_total >= 8.5 AND every dimension floor met
-- "revise" = weighted_total < 8.5 OR any dimension below its floor (other than factual_integrity)
-- "kill" = factual_integrity < 10 (any unverifiable claim against source data) — automatic regardless of other scores
+- "revise" = weighted_total < 8.5 OR any dimension below its floor — even if weighted_total is 2.0 or lower
+- "kill" = factual_integrity < 10 ONLY. This is the ONLY trigger for kill. A draft with fabricated stats or invented case studies gets kill regardless of other scores. A draft that scores 0 on every other dimension but has factual_integrity = 10 is ALWAYS "revise", never "kill". Bad writing is always fixable — fabricated facts are not.
+
+CRITICAL: Do NOT use "kill" for drafts that are simply low quality, generic, or badly written. Only use "kill" if you detect invented facts, fabricated names/testimonials, or unverifiable statistics. If factual_integrity = 10, the verdict must be "ship" or "revise" — never "kill".
 
 REVISION DIRECTIVES RULES:
 - Be specific. "Hook is generic" is not enough. Write: "Replace 'Are you struggling...' with a specific number or confession opener."
@@ -178,7 +180,7 @@ def _build_judge(
 
     # CRITICAL: Haiku, NOT the model used to write the draft
     model = ChatAnthropic(
-        model="claude-haiku-4-5-20250929",
+        model="claude-haiku-4-5",
         temperature=0.2,
         max_tokens=1500,
     )
