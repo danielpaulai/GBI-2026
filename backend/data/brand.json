@@ -1,0 +1,150 @@
+{
+  "_comment": "Single source of truth for Jarvis brand identity. Read by every agent + Satori cards.",
+
+  "brand": "Purely Personal",
+  "owner": "Daniel Paul",
+
+  "palette": {
+    "primary": "#ec4357",
+    "primary_alt": "#d92e44",
+    "background": "#0a0204",
+    "accent_gold": "#fbbf24",
+    "text_primary": "#ffffff",
+    "text_muted": "#c8c8c8",
+    "border": "#2a3848"
+  },
+
+  "typography": {
+    "display": "Space Grotesk",
+    "body": "Inter",
+    "mono": "JetBrains Mono"
+  },
+
+  "voice": {
+    "anchor_words": [
+      "Tuesday",
+      "deploy",
+      "build",
+      "ship",
+      "AI employee",
+      "AI CEO"
+    ],
+
+    "catchphrase": "Who builds the AI? I DO!",
+
+    "voice_dna_summary": "Punchy. Hook-first. Second-person. Sentence fragments OK. Short paragraphs. Numbers and specifics over abstractions. Max 1 emoji per post. No hashtags. Plain English at a 4th-grade reading level except for industry terms.",
+
+    "tone_options": [
+      "Authority/Hormozi",
+      "Witty/Morning Brew",
+      "Wisdom/James Clear",
+      "Growth/Sahil Bloom"
+    ],
+
+    "banned_phrases": [
+      "leverage",
+      "synergize",
+      "unlock potential",
+      "in today's world",
+      "in the digital age",
+      "delve",
+      "tapestry",
+      "navigate the landscape",
+      "embark on a journey",
+      "game-changer",
+      "at the end of the day",
+      "let's dive in",
+      "I hope this email finds you well",
+      "in conclusion",
+      "utilize",
+      "paradigm",
+      "optimize"
+    ],
+
+    "banned_openers": [
+      "In today's",
+      "Are you struggling",
+      "Here's the thing",
+      "Let's dive in",
+      "Picture this",
+      "Imagine",
+      "Hi [name]",
+      "Dear",
+      "Hi there"
+    ],
+
+    "em_dash_cap_per_200_words": 1,
+
+    "hashtags_allowed": false,
+
+    "filler_phrases_banned": [
+      "Great question!",
+      "Absolutely!",
+      "I'd be happy to help!",
+      "That's a fantastic point",
+      "Certainly!"
+    ]
+  },
+
+  "photo_style": {
+    "_comment": "Used for hero photo generation only. NOT for post cards (those use Satori).",
+    "lens": "Sony 35mm f/1.4",
+    "shutter": "1/125s",
+    "iso_range": "400-800",
+    "lighting": "camera-left tungsten softbox 30° elevated, 1:8 key-to-fill",
+    "color_grade": "Kodak Portra 400, slight halation",
+    "mood": "premium, professional, slight cinematic warmth"
+  },
+
+  "card_grid": {
+    "_comment": "Layout defaults for Satori post cards.",
+    "aspect_ratios": {
+      "square": "1200x1200",
+      "landscape": "1200x627",
+      "portrait": "1080x1350",
+      "story": "1080x1920"
+    },
+    "padding": 80,
+    "title_font_size": 56,
+    "body_font_size": 24,
+    "logo_position": "bottom-left",
+    "logo_size": 48
+  },
+
+  "judge_rubric": {
+    "_comment": "Default thresholds. Per-content-type rubrics live in creative_review.py.",
+    "linkedin_text_post": {
+      "weighted_floor": 8.5,
+      "veto_dimension": "factual_integrity",
+      "veto_floor": 10
+    },
+    "newsletter": {
+      "weighted_floor": 8.5,
+      "veto_dimension": "factual_integrity",
+      "veto_floor": 10
+    },
+    "instagram": {
+      "weighted_floor": 8.5,
+      "veto_dimension": "factual_integrity",
+      "veto_floor": 10
+    },
+    "blog_post": {
+      "weighted_floor": 8.5,
+      "veto_dimension": "factual_integrity",
+      "veto_floor": 10
+    },
+    "landing_page": {
+      "weighted_floor": 8.5,
+      "veto_dimension": "factual_integrity",
+      "veto_floor": 10
+    }
+  },
+
+  "outlier_corpus": {
+    "_comment": "Pointer to where Outlier Detector data is stored. Pulled into judge prompts.",
+    "source_db": "outlier_detector",
+    "min_performance_multiplier": 2.0,
+    "examples_per_judgment": 5,
+    "platforms": ["linkedin", "instagram", "tiktok", "youtube"]
+  }
+}
